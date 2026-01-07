@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "id": "flashcarts",
+  "version": "${version}",
+  "name": "FlashCarts",
+  "description": "",
+  "authors": [],
+  "contact": {},
+  "license": "All-Rights-Reserved",
+  "icon": "assets/flashcarts/icon.png",
+  "environment": "server",
+  "entrypoints": {
+    "main": [
+      "nl.gjorgdy.flashcarts.Flashcarts"
+    ]
+  },
+  "mixins": [
+    "flashcarts.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=${loader_version}",
+    "fabric-api": "*",
+    "minecraft": "${minecraft_version}"
+  }
+}
