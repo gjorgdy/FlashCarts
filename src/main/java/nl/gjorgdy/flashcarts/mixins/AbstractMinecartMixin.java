@@ -8,6 +8,7 @@ import net.minecraft.world.entity.vehicle.VehicleEntity;
 import net.minecraft.world.entity.vehicle.minecart.*;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import nl.gjorgdy.flashcarts.Flashcarts;
 import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -25,9 +26,6 @@ public abstract class AbstractMinecartMixin extends VehicleEntity {
 	@Unique
 	private final AbstractMinecart self = (AbstractMinecart) (Object) this;
 
-	@Unique
-	private final static float BLOCK_SPEED_FACTOR_RAILS = 16.0F;
-
 	public AbstractMinecartMixin(EntityType<?> entityType, Level level) {
 		super(entityType, level);
 	}
@@ -36,7 +34,7 @@ public abstract class AbstractMinecartMixin extends VehicleEntity {
 	private void _getBlockSpeedFactor(CallbackInfoReturnable<Float> cir) {
 		if (self.getBehavior() instanceof OldMinecartBehavior) return;
 		BlockState blockState = this.level().getBlockState(this.blockPosition());
-		cir.setReturnValue(blockState.is(BlockTags.RAILS) ? BLOCK_SPEED_FACTOR_RAILS : super.getBlockSpeedFactor());
+		cir.setReturnValue(blockState.is(BlockTags.RAILS) ? Flashcarts.BLOCK_SPEED_FACTOR_RAILS : super.getBlockSpeedFactor());
 		cir.cancel();
 	}
 
