@@ -35,7 +35,7 @@ public abstract class ServerEntityMixin {
 	@Definition(id = "AbstractMinecart", type = AbstractMinecart.class)
 	@Expression("? instanceof AbstractMinecart")
 	@WrapOperation(method = "sendChanges()V", at = @At("MIXINEXTRAS:EXPRESSION"))
-	private boolean fakeDefaultController(Object object, Operation<Boolean> original) {
+	private boolean fakeNewPackets(Object object, Operation<Boolean> original) {
 		if (object instanceof AbstractMinecart minecart) {
 			if (minecart.getBehavior() instanceof OldMinecartBehavior) {
 				float xRot = 0f;

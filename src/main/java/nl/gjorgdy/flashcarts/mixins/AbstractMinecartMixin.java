@@ -43,15 +43,16 @@ public abstract class AbstractMinecartMixin extends VehicleEntity {
 		getPassengers().forEach(p -> {
 			if (p instanceof ServerPlayer player) {
 				var speed = getSpeedBlocksPerSecond();
-				if (speed > 0.1) { // TODO: base on breaking speed
+				if (speed > Flashcarts.HALT_SPEED_THRESHOLD) { // TODO: base on breaking speed
 					player.sendSystemMessage(Component.literal(String.format("%.2f", speed) + " b/s"), true);
 				} else {
 					player.sendSystemMessage(Component.empty(), true);
 				}
 			}
 		});
-		if (self instanceof Minecart && this.behavior instanceof OldMinecartBehavior) {
-//			System.out.println("Upgrading minecart behavior to new system.");
+		if ((self instanceof Minecart || (self instanceof MinecartTNT && Flashcarts.INCREASE_TNT_MINECART_SPEED))
+				&& this.behavior instanceof OldMinecartBehavior
+		) {
 			this.behavior = new NewMinecartBehavior(self);
 		}
 	}
