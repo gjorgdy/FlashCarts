@@ -34,7 +34,7 @@ public abstract class AbstractMinecartMixin extends VehicleEntity {
 	private void _getBlockSpeedFactor(CallbackInfoReturnable<Float> cir) {
 		if (self.getBehavior() instanceof OldMinecartBehavior) return;
 		BlockState blockState = this.level().getBlockState(this.blockPosition());
-		cir.setReturnValue(blockState.is(BlockTags.RAILS) ? Flashcarts.BLOCK_SPEED_FACTOR_RAILS : super.getBlockSpeedFactor());
+		cir.setReturnValue(blockState.is(BlockTags.RAILS) ? Flashcarts.config.getBlockSpeedFactorRails() : super.getBlockSpeedFactor());
 		cir.cancel();
 	}
 
@@ -43,14 +43,14 @@ public abstract class AbstractMinecartMixin extends VehicleEntity {
 		getPassengers().forEach(p -> {
 			if (p instanceof ServerPlayer player) {
 				var speed = getSpeedBlocksPerSecond();
-				if (speed > Flashcarts.HALT_SPEED_THRESHOLD) { // TODO: base on breaking speed
+				if (speed > Flashcarts.config.getHaltSpeedThreshold()) { // TODO: base on breaking speed
 					player.sendSystemMessage(Component.literal(String.format("%.2f", speed) + " b/s"), true);
 				} else {
 					player.sendSystemMessage(Component.empty(), true);
 				}
 			}
 		});
-		if ((self instanceof Minecart || (self instanceof MinecartTNT && Flashcarts.INCREASE_TNT_MINECART_SPEED))
+		if ((self instanceof Minecart || (self instanceof MinecartTNT && Flashcarts.config.shouldIncreaseTntMinecartSpeed()))
 				&& this.behavior instanceof OldMinecartBehavior
 		) {
 			this.behavior = new NewMinecartBehavior(self);

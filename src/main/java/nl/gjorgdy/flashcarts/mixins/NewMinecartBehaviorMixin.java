@@ -18,7 +18,7 @@ public abstract class NewMinecartBehaviorMixin extends MinecartBehavior {
 
 	@Inject(at = @At("HEAD"), method = "getMaxSpeed", cancellable = true)
 	public void overrideMaxSpeed(ServerLevel level, CallbackInfoReturnable<Double> cir) {
-		cir.setReturnValue(Flashcarts.MAX_SPEED_BLOCKS_PER_SECOND * (this.minecart.isInWater() ? 0.5 : 1.0) / 20.0);
+		cir.setReturnValue(Flashcarts.config.getMaxSpeedBlocksPerSecond() * (this.minecart.isInWater() ? 0.5 : 1.0) / 20.0);
 		cir.cancel();
 	}
 
@@ -27,7 +27,7 @@ public abstract class NewMinecartBehaviorMixin extends MinecartBehavior {
 		constant = @Constant(doubleValue = 0.03)
 	)
 	private double replaceHaltThreshold(double constant) {
-		return Flashcarts.HALT_SPEED_THRESHOLD;
+		return Flashcarts.config.getHaltSpeedThreshold();
 	}
 
 	@ModifyArg(
@@ -36,7 +36,7 @@ public abstract class NewMinecartBehaviorMixin extends MinecartBehavior {
 			index = 0
 	)
 	private double replaceHaltMultiplier(double d) {
-		return Flashcarts.HALT_SPEED_MULTIPLIER;
+		return Flashcarts.config.getHaltSpeedMultiplier();
 	}
 
 }
