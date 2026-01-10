@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
-  "id": "flashcarts",
+  "id": "flash_carts",
   "version": "${version}",
-  "name": "FlashCarts",
+  "name": "Flash Carts",
   "description": "",
   "authors": [],
   "contact": {},

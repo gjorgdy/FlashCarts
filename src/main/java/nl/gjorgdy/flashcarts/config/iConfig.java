@@ -1,4 +1,4 @@
-package nl.gjorgdy.flashcarts;
+package nl.gjorgdy.flashcarts.config;
 
 public interface iConfig {
 

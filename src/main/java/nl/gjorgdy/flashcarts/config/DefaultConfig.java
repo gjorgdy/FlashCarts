@@ -1,6 +1,12 @@
-package nl.gjorgdy.flashcarts;
+package nl.gjorgdy.flashcarts.config;
 
 public class DefaultConfig implements iConfig {
+
+	private DefaultConfig() {}
+
+	public static DefaultConfig load() {
+		return new DefaultConfig();
+	}
 
 	@Override
 	public boolean shouldIncreaseTntMinecartSpeed() {
