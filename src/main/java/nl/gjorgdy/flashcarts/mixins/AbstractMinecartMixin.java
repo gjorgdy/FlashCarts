@@ -2,12 +2,10 @@ package nl.gjorgdy.flashcarts.mixins;
 
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.tags.BlockTags;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.vehicle.VehicleEntity;
 import net.minecraft.world.entity.vehicle.minecart.*;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.state.BlockState;
 import nl.gjorgdy.flashcarts.Flashcarts;
 import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.At;
@@ -50,7 +48,7 @@ public abstract class AbstractMinecartMixin extends VehicleEntity {
 
 	@Unique
 	private double getSpeedBlocksPerSecond() {
-		return Math.min(this.getKnownSpeed().length() * 20, Flashcarts.config.getMaxSpeedBlocksPerSecond());
+		return Math.min(this.getKnownSpeed().length() * 20, Flashcarts.config.getMaxSpeed());
 	}
 
 }

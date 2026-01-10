@@ -13,12 +13,17 @@ public class Flashcarts implements ModInitializer {
 
 	public static final String MOD_ID = "flash_carts";
 
+	public static String VERSION = "unknown";
+
 	public static final Logger LOGGER = LogManager.getLogger("flash_carts");
 
 	public static iConfig config;
 
 	@Override
 	public void onInitialize() {
+		FabricLoader.getInstance().getModContainer(MOD_ID).ifPresent(mod -> {
+			VERSION = mod.getMetadata().getVersion().getFriendlyString();
+		});
 		if (FabricLoader.getInstance().isModLoaded("fzzy_config")) {
 			config = FzzyConfig.load();
 		} else {

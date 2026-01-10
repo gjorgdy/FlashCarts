@@ -25,19 +25,19 @@ public class FzzyConfig extends Config implements iConfig {
 	}
 
 	@Comment("Should TNT Minecarts also make use of the increased speed and experimental physics")
-	private boolean increaseTntMinecartSpeed = true;
+	private boolean increaseTntMinecartSpeed = default_increaseTntMinecartSpeed;
 
 	@Comment("Maximum speed for minecarts in blocks per second, vanilla: 8")
-	private ValidatedInt maxSpeedBlocksPerSecond = new ValidatedInt(100, 256, 8, ValidatedNumber.WidgetType.SLIDER);
+	private ValidatedInt maxSpeed = new ValidatedInt(default_maxSpeed, 256, 8, ValidatedNumber.WidgetType.SLIDER);
 
 	@Comment("Percentage of boost a powered rail should give, vanilla: 0.06 (6%)")
-	private ValidatedFloat poweredRailBoostPercentage = new ValidatedFloat( 0.12f, 0.99f, 0.1f, ValidatedNumber.WidgetType.SLIDER);
+	private ValidatedFloat poweredRailBoostPercentage = new ValidatedFloat( default_poweredRailBoostPercentage, 0.99f, 0.1f, ValidatedNumber.WidgetType.SLIDER);
 
 	@Comment("How slow a minecart has to be, to be considered halted, vanilla: 0.03")
-	private ValidatedDouble haltSpeedThreshold = new ValidatedDouble(0.02, 0.99, 0.01, ValidatedNumber.WidgetType.SLIDER);
+	private ValidatedDouble haltSpeedThreshold = new ValidatedDouble(default_haltSpeedThreshold, 0.99, 0.01, ValidatedNumber.WidgetType.SLIDER);
 
 	@Comment("Multiplier applied to speed when minecart is considered halted, vanilla: 0.5")
-	private ValidatedDouble haltSpeedMultiplier = new ValidatedDouble(0.35, 0.9, 0.1, ValidatedNumber.WidgetType.SLIDER);
+	private ValidatedDouble haltSpeedMultiplier = new ValidatedDouble(default_haltSpeedMultiplier, 0.9, 0.1, ValidatedNumber.WidgetType.SLIDER);
 
 	@Override
 	public boolean shouldIncreaseTntMinecartSpeed() {
@@ -45,8 +45,8 @@ public class FzzyConfig extends Config implements iConfig {
 	}
 
 	@Override
-	public int getMaxSpeedBlocksPerSecond() {
-		return maxSpeedBlocksPerSecond.get();
+	public int getMaxSpeed() {
+		return maxSpeed.get();
 	}
 
 	@Override

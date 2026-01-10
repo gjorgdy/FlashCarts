@@ -10,26 +10,26 @@ public class DefaultConfig implements iConfig {
 
 	@Override
 	public boolean shouldIncreaseTntMinecartSpeed() {
-		return true;
+		return default_increaseTntMinecartSpeed;
 	}
 
 	@Override
-	public int getMaxSpeedBlocksPerSecond() {
-		return 100;
+	public int getMaxSpeed() {
+		return default_maxSpeed;
 	}
 
 	@Override
 	public float getPoweredRailBoostPercentage() {
-		return 0.12f;
+		return default_poweredRailBoostPercentage;
 	}
 
 	@Override
 	public double getHaltSpeedThreshold() {
-		return 0.02;
+		return default_haltSpeedThreshold;
 	}
 
 	@Override
 	public double getHaltSpeedMultiplier() {
-		return 0.35;
+		return default_haltSpeedMultiplier;
 	}
 }
