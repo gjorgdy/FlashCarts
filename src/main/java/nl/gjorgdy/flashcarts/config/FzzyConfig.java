@@ -30,8 +30,8 @@ public class FzzyConfig extends Config implements iConfig {
 	@Comment("Maximum speed for minecarts in blocks per second, vanilla: 8")
 	private ValidatedInt maxSpeedBlocksPerSecond = new ValidatedInt(100, 256, 8, ValidatedNumber.WidgetType.SLIDER);
 
-	@Comment("Speed factor for minecarts on rails (higher is faster), vanilla: 1.0")
-	private ValidatedFloat blockSpeedFactorRails = new ValidatedFloat( 16f, 100f, 1f, ValidatedNumber.WidgetType.SLIDER);
+	@Comment("Percentage of boost a powered rail should give, vanilla: 0.06 (6%)")
+	private ValidatedFloat poweredRailBoostPercentage = new ValidatedFloat( 0.12f, 0.99f, 0.1f, ValidatedNumber.WidgetType.SLIDER);
 
 	@Comment("How slow a minecart has to be, to be considered halted, vanilla: 0.03")
 	private ValidatedDouble haltSpeedThreshold = new ValidatedDouble(0.02, 0.99, 0.01, ValidatedNumber.WidgetType.SLIDER);
@@ -50,8 +50,8 @@ public class FzzyConfig extends Config implements iConfig {
 	}
 
 	@Override
-	public float getBlockSpeedFactorRails() {
-		return blockSpeedFactorRails.get();
+	public float getPoweredRailBoostPercentage() {
+		return poweredRailBoostPercentage.get();
 	}
 
 	@Override

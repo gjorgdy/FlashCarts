@@ -13,7 +13,6 @@ import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(AbstractMinecart.class)
 public abstract class AbstractMinecartMixin extends VehicleEntity {
@@ -28,14 +27,6 @@ public abstract class AbstractMinecartMixin extends VehicleEntity {
 
 	public AbstractMinecartMixin(EntityType<?> entityType, Level level) {
 		super(entityType, level);
-	}
-
-	@Inject(at = @At("HEAD"), method = "getBlockSpeedFactor", cancellable = true)
-	private void _getBlockSpeedFactor(CallbackInfoReturnable<Float> cir) {
-		if (self.getBehavior() instanceof OldMinecartBehavior) return;
-		BlockState blockState = this.level().getBlockState(this.blockPosition());
-		cir.setReturnValue(blockState.is(BlockTags.RAILS) ? Flashcarts.config.getBlockSpeedFactorRails() : super.getBlockSpeedFactor());
-		cir.cancel();
 	}
 
 	@Inject(at = @At("HEAD"), method = "tick")
@@ -59,7 +50,7 @@ public abstract class AbstractMinecartMixin extends VehicleEntity {
 
 	@Unique
 	private double getSpeedBlocksPerSecond() {
-		return Math.min(this.getKnownSpeed().length() * 20, 100);
+		return Math.min(this.getKnownSpeed().length() * 20, Flashcarts.config.getMaxSpeedBlocksPerSecond());
 	}
 
 }

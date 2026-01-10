@@ -23,6 +23,14 @@ public abstract class NewMinecartBehaviorMixin extends MinecartBehavior {
 	}
 
 	@ModifyConstant(
+			method = "calculateBoostTrackSpeed(Lnet/minecraft/world/phys/Vec3;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;)Lnet/minecraft/world/phys/Vec3;",
+			constant = @Constant(doubleValue = 0.06)
+	)
+	private double replaceBoostPercentage(double constant) {
+		return Flashcarts.config.getPoweredRailBoostPercentage();
+	}
+
+	@ModifyConstant(
 		method = "calculateHaltTrackSpeed(Lnet/minecraft/world/phys/Vec3;Lnet/minecraft/world/level/block/state/BlockState;)Lnet/minecraft/world/phys/Vec3;",
 		constant = @Constant(doubleValue = 0.03)
 	)

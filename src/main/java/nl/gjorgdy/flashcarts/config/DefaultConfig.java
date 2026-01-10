@@ -19,8 +19,8 @@ public class DefaultConfig implements iConfig {
 	}
 
 	@Override
-	public float getBlockSpeedFactorRails() {
-		return 16f;
+	public float getPoweredRailBoostPercentage() {
+		return 0.12f;
 	}
 
 	@Override

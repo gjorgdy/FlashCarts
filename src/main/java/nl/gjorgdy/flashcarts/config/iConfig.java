@@ -6,7 +6,7 @@ public interface iConfig {
 
 	int getMaxSpeedBlocksPerSecond();
 
-	float getBlockSpeedFactorRails();
+	float getPoweredRailBoostPercentage();
 
 	double getHaltSpeedThreshold();
 
