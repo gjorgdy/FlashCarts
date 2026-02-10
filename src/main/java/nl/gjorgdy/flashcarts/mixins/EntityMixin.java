@@ -40,11 +40,11 @@ public class EntityMixin {
 			return;
 		}
 		if (collider.getKnownMovement().length() < self.getKnownMovement().length()) {
-			if (self.countPlayerPassengers() >= 1 && collider instanceof VehicleEntityInvoker colliderMinecart) {
+			if (self.countPlayerPassengers() >= 1 && collider.countPlayerPassengers() == 0 && collider instanceof VehicleEntityInvoker colliderMinecart) {
 				colliderMinecart.flash_cart$destroy((ServerLevel) collider.level(), colliderMinecart.flash_cart$getDropItem());
 			}
 		} else {
-			if (collider.countPlayerPassengers() >= 1 && self instanceof VehicleEntityInvoker selfMinecart) {
+			if (collider.countPlayerPassengers() >= 1 && self.countPlayerPassengers() == 0 && self instanceof VehicleEntityInvoker selfMinecart) {
 				selfMinecart.flash_cart$destroy((ServerLevel) self.level(), selfMinecart.flash_cart$getDropItem());
 			}
 		}
