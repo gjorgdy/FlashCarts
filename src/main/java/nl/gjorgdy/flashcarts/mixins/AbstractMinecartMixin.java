@@ -27,14 +27,20 @@ public abstract class AbstractMinecartMixin extends VehicleEntity {
 	}
 
 	@Inject(at = @At("HEAD"), method = "tick")
-	public void _tick(CallbackInfo ci) {
+	public void tick(CallbackInfo ci) {
 		getPassengers().forEach(p -> {
 			if (p instanceof ServerPlayer player) {
 				var speed = getSpeedBlocksPerSecond();
 				if (speed > Flashcarts.config.getHaltSpeedThreshold()) {
-					player.sendSystemMessage(Component.literal(String.format("%.2f", speed) + " b/s"), true);
+					int bars = (int) Math.round(speed / Flashcarts.config.getMaxSpeed() * 10);
+					String barString = "§a" + "▮".repeat(Math.min(bars, 7))
+							   + "§e" + "▮".repeat(Math.min(Math.max(bars - 7, 0), 2))
+							   + "§c" + "▮".repeat(Math.max(bars - 9, 0))
+							   + "§7" + "▮".repeat(10 - bars);
+					player.sendSystemMessage(Component.literal(barString + String.format(" %.2f", speed) + " b/s"), true);
 				} else {
-					player.sendSystemMessage(Component.empty(), true);
+					String barString = "§7" + "▮".repeat(10);
+					player.sendSystemMessage(Component.literal(barString + " 0.00 b/s"), true);
 				}
 			}
 		});
