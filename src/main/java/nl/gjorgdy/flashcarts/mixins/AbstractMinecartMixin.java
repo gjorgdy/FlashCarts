@@ -15,13 +15,12 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(AbstractMinecart.class)
 public abstract class AbstractMinecartMixin extends VehicleEntity {
 
+	@Unique
+	private final AbstractMinecart self = (AbstractMinecart) (Object) this;
 	@Mutable
 	@Final
 	@Shadow
 	private MinecartBehavior behavior;
-
-	@Unique
-	private final AbstractMinecart self = (AbstractMinecart) (Object) this;
 
 	public AbstractMinecartMixin(EntityType<?> entityType, Level level) {
 		super(entityType, level);
@@ -32,7 +31,7 @@ public abstract class AbstractMinecartMixin extends VehicleEntity {
 		getPassengers().forEach(p -> {
 			if (p instanceof ServerPlayer player) {
 				var speed = getSpeedBlocksPerSecond();
-				if (speed > Flashcarts.config.getHaltSpeedThreshold()) { // TODO: base on breaking speed
+				if (speed > Flashcarts.config.getHaltSpeedThreshold()) {
 					player.sendSystemMessage(Component.literal(String.format("%.2f", speed) + " b/s"), true);
 				} else {
 					player.sendSystemMessage(Component.empty(), true);
@@ -40,7 +39,7 @@ public abstract class AbstractMinecartMixin extends VehicleEntity {
 			}
 		});
 		if ((self instanceof Minecart || (self instanceof MinecartTNT && Flashcarts.config.shouldIncreaseTntMinecartSpeed()))
-				&& this.behavior instanceof OldMinecartBehavior
+					&& this.behavior instanceof OldMinecartBehavior
 		) {
 			this.behavior = new NewMinecartBehavior(self);
 		}
