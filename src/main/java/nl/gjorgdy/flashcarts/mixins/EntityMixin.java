@@ -4,6 +4,8 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntitySelector;
 import net.minecraft.world.entity.vehicle.minecart.AbstractMinecart;
+import net.minecraft.world.entity.vehicle.minecart.Minecart;
+import net.minecraft.world.entity.vehicle.minecart.OldMinecartBehavior;
 import net.minecraft.world.phys.Vec3;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -15,6 +17,16 @@ import java.util.List;
 
 @Mixin(Entity.class)
 public class EntityMixin {
+
+//	@Inject(method = "positionRider(Lnet/minecraft/world/entity/Entity;Lnet/minecraft/world/entity/Entity$MoveFunction;)V", at = @At("HEAD"), cancellable = true)
+//	private void cancelUpdate(CallbackInfo ci) {
+//		if (((Object) this) instanceof Minecart minecart) {
+//			if (minecart.getBehavior() instanceof OldMinecartBehavior) {
+//				System.out.println("Canceling update for minecart with id " + minecart.getId());
+//				ci.cancel();
+//			}
+//		}
+//	}
 
 	@Inject(method = "setOnGroundWithMovement(ZZLnet/minecraft/world/phys/Vec3;)V", at = @At("HEAD"))
 	public void onPush(boolean bl, boolean horizontalCollision, Vec3 vec3, CallbackInfo ci) {

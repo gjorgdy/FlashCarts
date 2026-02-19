@@ -4,10 +4,14 @@ import com.llamalad7.mixinextras.expression.Definition;
 import com.llamalad7.mixinextras.expression.Expression;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundMoveMinecartPacket;
 import net.minecraft.server.level.ServerEntity;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.vehicle.minecart.AbstractMinecart;
+import net.minecraft.world.entity.vehicle.minecart.Minecart;
 import net.minecraft.world.entity.vehicle.minecart.NewMinecartBehavior;
 import net.minecraft.world.entity.vehicle.minecart.OldMinecartBehavior;
 import net.minecraft.world.level.block.BaseRailBlock;
@@ -29,8 +33,20 @@ public abstract class ServerEntityMixin {
 	@Shadow
 	private ServerLevel level;
 
+	@Shadow
+	@Final
+	private Entity entity;
 	@Unique
 	private NewMinecartBehavior.MinecartStep previousStep = null;
+
+	// TODO : test if this works
+	@WrapOperation(method = "sendChanges", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerEntity$Synchronizer;sendToTrackingPlayers(Lnet/minecraft/network/protocol/Packet;)V"))
+	private void cancelUpdate(ServerEntity.Synchronizer instance, Packet<? super ClientGamePacketListener> packet, Operation<Void> original) {
+		if (this.entity instanceof Minecart minecart && minecart.getBehavior() instanceof OldMinecartBehavior) {
+			return;
+		}
+		original.call(instance, packet);
+	}
 
 	@Definition(id = "AbstractMinecart", type = AbstractMinecart.class)
 	@Expression("? instanceof AbstractMinecart")
@@ -41,16 +57,27 @@ public abstract class ServerEntityMixin {
 				float xRot = 0f;
 				var block = this.level.getBlockState(minecart.getOnPos());
 				if (block.getBlock() instanceof BaseRailBlock rail && block.getValue(rail.getShapeProperty()).isSlope()) {
+//					xRot = minecart.isFlipped() ? 45f : -45f;
 					xRot = switch (block.getValue(rail.getShapeProperty())) {
-						case ASCENDING_NORTH, ASCENDING_EAST -> minecart.getYRot() <= 0 ? -45f : 45f;
-						case ASCENDING_SOUTH, ASCENDING_WEST -> minecart.getYRot() <= 0 ? 45f : -45f;
+						case ASCENDING_NORTH, ASCENDING_EAST -> minecart.isFlipped() ? -45f : 45f;
+						case ASCENDING_SOUTH, ASCENDING_WEST -> minecart.isFlipped() ? 45f : -45f;
 						default -> 0f;
 					};
 				}
-				var step = new NewMinecartBehavior.MinecartStep(minecart.position(), minecart.getDeltaMovement(), minecart.getYRot() * -1, xRot, 1.0F);
+				var movement = minecart.position().subtract(previousStep == null ? minecart.position() : previousStep.position());
+				var distance = (float) movement.length();
+				var step = new NewMinecartBehavior.MinecartStep(
+						minecart.position(),
+						movement,
+						minecart.getYRot() * -1.0F,
+						xRot * (minecart.isFlipped() ? 1.0F : -1.0F),
+						distance
+				);
+//				var steps = List.of(step);
 				var steps = previousStep == null ? List.of(step) : List.of(previousStep, step);
 				this.synchronizer.sendToTrackingPlayers(new ClientboundMoveMinecartPacket(minecart.getId(), steps));
-				this.previousStep = new NewMinecartBehavior.MinecartStep(step.position(), step.movement(), step.yRot(), step.xRot(), 0F);
+
+				this.previousStep = new NewMinecartBehavior.MinecartStep(step.position(), step.movement(), step.yRot(), step.xRot(), 0.0f);
 				return false;
 			}
 			return true;

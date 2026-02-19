@@ -44,10 +44,35 @@ public abstract class AbstractMinecartMixin extends VehicleEntity {
 				}
 			}
 		});
-		if ((self instanceof Minecart || (self instanceof MinecartTNT && Flashcarts.config.shouldIncreaseTntMinecartSpeed()))
-					&& this.behavior instanceof OldMinecartBehavior
-		) {
+		if (shouldUseNewBehavior()) {
+			setNewMinecartBehavior();
+		}
+		else {
+			setOldMinecartBehavior();
+		}
+	}
+
+	@Unique
+	private boolean shouldUseNewBehavior() {
+		return (self instanceof MinecartTNT && Flashcarts.config.shouldIncreaseTntMinecartSpeed())
+			|| (self instanceof Minecart && (
+			   (self.getFirstPassenger() instanceof ServerPlayer)
+				|| (this.getPassengers().isEmpty() && Flashcarts.config.shouldIncreaseEmptyMinecartSpeed())
+				|| (self.getFirstPassenger() != null && Flashcarts.config.shouldIncreaseNonPlayerMinecartSpeed())
+		));
+	}
+
+	@Unique
+	private void setNewMinecartBehavior() {
+		if (this.behavior instanceof OldMinecartBehavior) {
 			this.behavior = new NewMinecartBehavior(self);
+		}
+	}
+
+	@Unique
+	private void setOldMinecartBehavior() {
+		if (this.behavior instanceof NewMinecartBehavior) {
+			this.behavior = new OldMinecartBehavior(self);
 		}
 	}
 

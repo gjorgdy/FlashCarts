@@ -39,9 +39,25 @@ public class FzzyConfig extends Config implements iConfig {
 	@Comment("Multiplier applied to speed when minecart is considered halted, vanilla: 0.5")
 	private ValidatedDouble haltSpeedMultiplier = new ValidatedDouble(default_haltSpeedMultiplier, 0.9, 0.1, ValidatedNumber.WidgetType.SLIDER);
 
+	@Comment("Should empty Minecarts also make use of the increased speed and experimental physics, default: false")
+	private boolean shouldIncreaseEmptyMinecartSpeed = default_shouldIncreaseEmptyMinecartSpeed;
+
+	@Comment("Should Minecarts with a mob other than a player also make use of the increased speed and experimental physics, default: true")
+	private boolean shouldIncreaseNonPlayerMinecartSpeed = default_shouldIncreaseNonPlayerMinecartSpeed;
+
 	@Override
 	public boolean shouldIncreaseTntMinecartSpeed() {
 		return increaseTntMinecartSpeed;
+	}
+
+	@Override
+	public boolean shouldIncreaseEmptyMinecartSpeed() {
+		return shouldIncreaseEmptyMinecartSpeed;
+	}
+
+	@Override
+	public boolean shouldIncreaseNonPlayerMinecartSpeed() {
+		return shouldIncreaseNonPlayerMinecartSpeed;
 	}
 
 	@Override

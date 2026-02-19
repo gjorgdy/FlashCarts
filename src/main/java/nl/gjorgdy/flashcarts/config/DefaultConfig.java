@@ -14,6 +14,16 @@ public class DefaultConfig implements iConfig {
 	}
 
 	@Override
+	public boolean shouldIncreaseEmptyMinecartSpeed() {
+		return default_shouldIncreaseEmptyMinecartSpeed;
+	}
+
+	@Override
+	public boolean shouldIncreaseNonPlayerMinecartSpeed() {
+		return default_shouldIncreaseNonPlayerMinecartSpeed;
+	}
+
+	@Override
 	public int getMaxSpeed() {
 		return default_maxSpeed;
 	}

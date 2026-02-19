@@ -7,12 +7,26 @@ public interface iConfig {
 	float default_poweredRailBoostPercentage = 0.12f;
 	double default_haltSpeedThreshold = 0.05;
 	double default_haltSpeedMultiplier = 0.3;
+	boolean default_shouldIncreaseEmptyMinecartSpeed = false;
+	boolean default_shouldIncreaseNonPlayerMinecartSpeed = true;
 
 	/**
 	 * Whether TNT minecarts should have increased speed.
 	 * @return true if TNT minecarts should have increased speed, false otherwise.
 	 */
 	boolean shouldIncreaseTntMinecartSpeed();
+
+	/**
+	 * Whether empty minecarts should have increased speed.
+	 * @return true if empty minecarts should have increased speed, false otherwise.
+	 */
+	boolean shouldIncreaseEmptyMinecartSpeed();
+
+	/**
+	 * Whether minecarts with a mob other than a player should have increased speed.
+	 * @return true if minecarts with a mob other than a player should have increased speed, false otherwise.
+	 */
+	boolean shouldIncreaseNonPlayerMinecartSpeed();
 
 	/**
 	 * Get the maximum speed for minecarts in blocks per second.
