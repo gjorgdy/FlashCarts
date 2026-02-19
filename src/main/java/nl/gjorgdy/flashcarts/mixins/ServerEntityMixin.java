@@ -57,12 +57,12 @@ public abstract class ServerEntityMixin {
 				float xRot = 0f;
 				var block = this.level.getBlockState(minecart.getOnPos());
 				if (block.getBlock() instanceof BaseRailBlock rail && block.getValue(rail.getShapeProperty()).isSlope()) {
-//					xRot = minecart.isFlipped() ? 45f : -45f;
 					xRot = switch (block.getValue(rail.getShapeProperty())) {
-						case ASCENDING_NORTH, ASCENDING_EAST -> minecart.isFlipped() ? -45f : 45f;
-						case ASCENDING_SOUTH, ASCENDING_WEST -> minecart.isFlipped() ? 45f : -45f;
+						case ASCENDING_NORTH, ASCENDING_EAST -> minecart.getYRot() == 180 ? -45f : 45f;
+						case ASCENDING_SOUTH, ASCENDING_WEST -> minecart.getYRot() == 90 ? 45f : -45f;
 						default -> 0f;
 					};
+					xRot *= minecart.isFlipped() ? -1.0F : 1.0F;
 				}
 				var movement = minecart.position().subtract(previousStep == null ? minecart.position() : previousStep.position());
 				var distance = (float) movement.length();
