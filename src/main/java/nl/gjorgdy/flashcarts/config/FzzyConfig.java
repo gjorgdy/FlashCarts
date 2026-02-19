@@ -31,7 +31,7 @@ public class FzzyConfig extends Config implements iConfig {
 	private ValidatedInt maxSpeed = new ValidatedInt(default_maxSpeed, 256, 8, ValidatedNumber.WidgetType.SLIDER);
 
 	@Comment("Percentage of boost a powered rail should give, vanilla: 0.06 (6%)")
-	private ValidatedFloat poweredRailBoostPercentage = new ValidatedFloat( default_poweredRailBoostPercentage, 0.99f, 0.1f, ValidatedNumber.WidgetType.SLIDER);
+	private ValidatedFloat poweredRailBoostPercentage = new ValidatedFloat( default_poweredRailBoostPercentage, 0.99f, 0.01f, ValidatedNumber.WidgetType.SLIDER);
 
 	@Comment("How slow a minecart has to be, to be considered halted, vanilla: 0.03")
 	private ValidatedDouble haltSpeedThreshold = new ValidatedDouble(default_haltSpeedThreshold, 0.99, 0.01, ValidatedNumber.WidgetType.SLIDER);
