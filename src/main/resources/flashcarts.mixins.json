@@ -10,6 +10,7 @@
     "AbstractMinecartMixin",
     "EntityMixin",
     "NewMinecartBehaviorMixin",
+    "OldMinecartBehaviorMixin",
     "ServerConfigurationPacketListenerImplMixin",
     "ServerEntityMixin",
     "VehicleEntityInvoker"

@@ -15,6 +15,7 @@ import net.minecraft.world.entity.vehicle.minecart.Minecart;
 import net.minecraft.world.entity.vehicle.minecart.NewMinecartBehavior;
 import net.minecraft.world.entity.vehicle.minecart.OldMinecartBehavior;
 import net.minecraft.world.level.block.BaseRailBlock;
+import nl.gjorgdy.flashcarts.interfaces.IMinecartLerpContainer;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -36,8 +37,8 @@ public abstract class ServerEntityMixin {
 	@Shadow
 	@Final
 	private Entity entity;
-	@Unique
-	private NewMinecartBehavior.MinecartStep previousStep = null;
+//	@Unique
+//	private NewMinecartBehavior.MinecartStep previousStep = null;
 
 	// TODO : test if this works
 	@WrapOperation(method = "sendChanges", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerEntity$Synchronizer;sendToTrackingPlayers(Lnet/minecraft/network/protocol/Packet;)V"))
@@ -53,31 +54,13 @@ public abstract class ServerEntityMixin {
 	@WrapOperation(method = "sendChanges()V", at = @At("MIXINEXTRAS:EXPRESSION"))
 	private boolean fakeNewPackets(Object object, Operation<Boolean> original) {
 		if (object instanceof AbstractMinecart minecart) {
-			if (minecart.getBehavior() instanceof OldMinecartBehavior) {
-				float xRot = 0f;
-				var block = this.level.getBlockState(minecart.getOnPos());
-				if (block.getBlock() instanceof BaseRailBlock rail && block.getValue(rail.getShapeProperty()).isSlope()) {
-					xRot = switch (block.getValue(rail.getShapeProperty())) {
-						case ASCENDING_NORTH, ASCENDING_EAST -> minecart.getYRot() == 180 ? -45f : 45f;
-						case ASCENDING_SOUTH, ASCENDING_WEST -> minecart.getYRot() == 90 ? 45f : -45f;
-						default -> 0f;
-					};
-					xRot *= minecart.isFlipped() ? -1.0F : 1.0F;
-				}
-				var movement = minecart.position().subtract(previousStep == null ? minecart.position() : previousStep.position());
-				var distance = (float) movement.length();
-				var step = new NewMinecartBehavior.MinecartStep(
-						minecart.position(),
-						movement,
-						minecart.getYRot() * -1.0F,
-						xRot * (minecart.isFlipped() ? 1.0F : -1.0F),
-						distance
+			if (minecart.getBehavior() instanceof IMinecartLerpContainer lerpContainer) {
+				this.synchronizer.sendToTrackingPlayers(
+					new ClientboundMoveMinecartPacket(
+						minecart.getId(),
+						lerpContainer.flashCarts$popSteps()
+					)
 				);
-//				var steps = List.of(step);
-				var steps = previousStep == null ? List.of(step) : List.of(previousStep, step);
-				this.synchronizer.sendToTrackingPlayers(new ClientboundMoveMinecartPacket(minecart.getId(), steps));
-
-				this.previousStep = new NewMinecartBehavior.MinecartStep(step.position(), step.movement(), step.yRot(), step.xRot(), 0.0f);
 				return false;
 			}
 			return true;
