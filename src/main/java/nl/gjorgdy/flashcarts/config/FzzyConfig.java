@@ -47,22 +47,22 @@ public class FzzyConfig extends Config implements IConfig {
 	private ICartConfig tntMinecart = new FzzyCartConfig(default_tntUseExperimentalPhysics, default_tntMaxSpeed);
 
 	@Override
-	public ICartConfig emptyMinecartConfig() {
+	public ICartConfig getEmptyMinecartConfig() {
 		return emptyMinecart;
 	}
 
 	@Override
-	public ICartConfig mobMinecartConfig() {
+	public ICartConfig getMobMinecartConfig() {
 		return mobMinecart;
 	}
 
 	@Override
-	public ICartConfig playerMinecartConfig() {
+	public ICartConfig getPlayerMinecartConfig() {
 		return playerMinecart;
 	}
 
 	@Override
-	public ICartConfig tntMinecartConfig() {
+	public ICartConfig getTntMinecartConfig() {
 		return tntMinecart;
 	}
 
@@ -101,12 +101,12 @@ public class FzzyConfig extends Config implements IConfig {
 		}
 
 		@Override
-		public boolean useExperimentalPhysics() {
+		public boolean shouldUseExperimentalPhysics() {
 			return useExperimentalPhysics;
 		}
 
 		@Override
-		public int maxSpeed() {
+		public int getMaxSpeed() {
 			return maxSpeedBlocksPerSecond.get();
 		}
 	}

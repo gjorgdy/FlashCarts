@@ -28,33 +28,33 @@ public interface IConfig {
 	 * Get the configuration for empty minecarts.
 	 * @return the configuration for empty minecarts.
 	 */
-	ICartConfig emptyMinecartConfig();
+	ICartConfig getEmptyMinecartConfig();
 
 	/**
 	 * Get the configuration for minecarts with mobs in them (excluding players).
 	 * @return the configuration for mob minecarts.
 	 */
-	ICartConfig mobMinecartConfig();
+	ICartConfig getMobMinecartConfig();
 
 	/**
 	 * Get the configuration for minecarts with players in them.
 	 * @return the configuration for player minecarts.
 	 */
-	ICartConfig playerMinecartConfig();
+	ICartConfig getPlayerMinecartConfig();
 
 	/**
 	 * Get the configuration for TNT minecarts.
 	 * @return the configuration for TNT minecarts.
 	 */
-	ICartConfig tntMinecartConfig();
+	ICartConfig getTntMinecartConfig();
 
 	@Nullable
 	default ICartConfig getConfigForMinecart(AbstractMinecart minecart) {
-		if (minecart instanceof MinecartTNT) return tntMinecartConfig();
+		if (minecart instanceof MinecartTNT) return getTntMinecartConfig();
 		if (minecart instanceof Minecart) {
-			if (minecart.getPassengers().isEmpty()) return emptyMinecartConfig();
-			if (minecart.getFirstPassenger() instanceof Player) return playerMinecartConfig();
-			if (!minecart.getPassengers().isEmpty()) return mobMinecartConfig();
+			if (minecart.getPassengers().isEmpty()) return getEmptyMinecartConfig();
+			if (minecart.getFirstPassenger() instanceof Player) return getPlayerMinecartConfig();
+			if (!minecart.getPassengers().isEmpty()) return getMobMinecartConfig();
 		}
 		return null;
 	}

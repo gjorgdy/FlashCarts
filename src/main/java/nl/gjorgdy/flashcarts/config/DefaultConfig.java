@@ -10,69 +10,69 @@ public class DefaultConfig implements IConfig {
 
 	private static final ICartConfig default_emptyMinecartConfig = new ICartConfig() {
 		@Override
-		public boolean useExperimentalPhysics() {
+		public boolean shouldUseExperimentalPhysics() {
 			return default_emptyUseExperimentalPhysics;
 		}
 
 		@Override
-		public int maxSpeed() {
+		public int getMaxSpeed() {
 			return default_emptyMaxSpeed;
 		}
 	};
 
 	private static final ICartConfig default_mobMinecartConfig = new ICartConfig() {
 		@Override
-		public boolean useExperimentalPhysics() {
+		public boolean shouldUseExperimentalPhysics() {
 			return default_mobUseExperimentalPhysics;
 		}
 
 		@Override
-		public int maxSpeed() {
+		public int getMaxSpeed() {
 			return default_mobMaxSpeed;
 		}
 	};
 
 	private static final ICartConfig default_playerMinecartConfig = new ICartConfig() {
 		@Override
-		public boolean useExperimentalPhysics() {
+		public boolean shouldUseExperimentalPhysics() {
 			return default_playerUseExperimentalPhysics;
 		}
 
 		@Override
-		public int maxSpeed() {
+		public int getMaxSpeed() {
 			return default_playerMaxSpeed;
 		}
 	};
 
 	private static final ICartConfig default_tntMinecartConfig = new ICartConfig() {
 		@Override
-		public boolean useExperimentalPhysics() {
+		public boolean shouldUseExperimentalPhysics() {
 			return default_tntUseExperimentalPhysics;
 		}
 
 		@Override
-		public int maxSpeed() {
+		public int getMaxSpeed() {
 			return default_tntMaxSpeed;
 		}
 	};
 
 	@Override
-	public ICartConfig emptyMinecartConfig() {
+	public ICartConfig getEmptyMinecartConfig() {
 		return default_emptyMinecartConfig;
 	}
 
 	@Override
-	public ICartConfig mobMinecartConfig() {
+	public ICartConfig getMobMinecartConfig() {
 		return default_mobMinecartConfig;
 	}
 
 	@Override
-	public ICartConfig playerMinecartConfig() {
+	public ICartConfig getPlayerMinecartConfig() {
 		return default_playerMinecartConfig;
 	}
 
 	@Override
-	public ICartConfig tntMinecartConfig() {
+	public ICartConfig getTntMinecartConfig() {
 		return default_tntMinecartConfig;
 	}
 
