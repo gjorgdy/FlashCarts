@@ -1,6 +1,6 @@
 package nl.gjorgdy.flashcarts.config;
 
-public class DefaultConfig implements iConfig {
+public class DefaultConfig implements IConfig {
 
 	private DefaultConfig() {}
 
@@ -8,24 +8,36 @@ public class DefaultConfig implements iConfig {
 		return new DefaultConfig();
 	}
 
+	private static final ICartConfig defaultMinecartConfig = new ICartConfig() {
+		@Override
+		public boolean useExperimentalPhysics() {
+			return true;
+		}
+
+		@Override
+		public int maxSpeed() {
+			return default_maxSpeed;
+		}
+	};
+
 	@Override
-	public boolean shouldIncreaseTntMinecartSpeed() {
-		return default_increaseTntMinecartSpeed;
+	public ICartConfig emptyMinecartConfig() {
+		return defaultMinecartConfig;
 	}
 
 	@Override
-	public boolean shouldIncreaseEmptyMinecartSpeed() {
-		return default_shouldIncreaseEmptyMinecartSpeed;
+	public ICartConfig mobMinecartConfig() {
+		return defaultMinecartConfig;
 	}
 
 	@Override
-	public boolean shouldIncreaseNonPlayerMinecartSpeed() {
-		return default_shouldIncreaseNonPlayerMinecartSpeed;
+	public ICartConfig playerMinecartConfig() {
+		return defaultMinecartConfig;
 	}
 
 	@Override
-	public int getMaxSpeed() {
-		return default_maxSpeed;
+	public ICartConfig tntMinecartConfig() {
+		return defaultMinecartConfig;
 	}
 
 	@Override

@@ -32,7 +32,7 @@ public abstract class AbstractMinecartMixin extends VehicleEntity {
 			if (p instanceof ServerPlayer player) {
 				var speed = getSpeedBlocksPerSecond();
 				if (speed > Flashcarts.config.getHaltSpeedThreshold()) {
-					int bars = (int) Math.round(speed / Flashcarts.config.getMaxSpeed() * 10);
+					int bars = (int) Math.round(speed / Flashcarts.config.playerMinecartConfig().maxSpeed() * 10);
 					String barString = "§a" + "▮".repeat(Math.min(bars, 7))
 							   + "§e" + "▮".repeat(Math.min(Math.max(bars - 7, 0), 2))
 							   + "§c" + "▮".repeat(Math.max(bars - 9, 0))
@@ -44,22 +44,13 @@ public abstract class AbstractMinecartMixin extends VehicleEntity {
 				}
 			}
 		});
-		if (shouldUseNewBehavior()) {
+		var cartConfig = Flashcarts.config.getConfigForMinecart(self);
+		if (cartConfig != null && cartConfig.useExperimentalPhysics()) {
 			setNewMinecartBehavior();
 		}
 		else {
 			setOldMinecartBehavior();
 		}
-	}
-
-	@Unique
-	private boolean shouldUseNewBehavior() {
-		return (self instanceof MinecartTNT && Flashcarts.config.shouldIncreaseTntMinecartSpeed())
-			|| (self instanceof Minecart && (
-			   (self.getFirstPassenger() instanceof ServerPlayer)
-				|| (this.getPassengers().isEmpty() && Flashcarts.config.shouldIncreaseEmptyMinecartSpeed())
-				|| (self.getFirstPassenger() != null && Flashcarts.config.shouldIncreaseNonPlayerMinecartSpeed())
-		));
 	}
 
 	@Unique
@@ -78,7 +69,11 @@ public abstract class AbstractMinecartMixin extends VehicleEntity {
 
 	@Unique
 	private double getSpeedBlocksPerSecond() {
-		return Math.min(this.getKnownSpeed().length() * 20, Flashcarts.config.getMaxSpeed());
+		var cartConfig = Flashcarts.config.getConfigForMinecart(self);
+		if (cartConfig == null) {
+			return self.getKnownSpeed().length() * 20;
+		}
+		return Math.min(this.getKnownSpeed().length() * 20, cartConfig.maxSpeed());
 	}
 
 }

@@ -18,7 +18,11 @@ public abstract class NewMinecartBehaviorMixin extends MinecartBehavior {
 
 	@Inject(at = @At("HEAD"), method = "getMaxSpeed", cancellable = true)
 	public void overrideMaxSpeed(ServerLevel level, CallbackInfoReturnable<Double> cir) {
-		cir.setReturnValue(Flashcarts.config.getMaxSpeed() * (this.minecart.isInWater() ? 0.5 : 1.0) / 20.0);
+		var cartConfig = Flashcarts.config.getConfigForMinecart(minecart);
+		if (cartConfig == null || !cartConfig.useExperimentalPhysics()) {
+			return;
+		}
+		cir.setReturnValue(cartConfig.maxSpeed() * (this.minecart.isInWater() ? 0.5 : 1.0) / 20.0);
 		cir.cancel();
 	}
 

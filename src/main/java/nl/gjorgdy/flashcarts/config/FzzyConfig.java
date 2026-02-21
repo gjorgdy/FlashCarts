@@ -5,6 +5,7 @@ import me.fzzyhmstrs.fzzy_config.annotations.IgnoreVisibility;
 import me.fzzyhmstrs.fzzy_config.api.ConfigApiJava;
 import me.fzzyhmstrs.fzzy_config.api.SaveType;
 import me.fzzyhmstrs.fzzy_config.config.Config;
+import me.fzzyhmstrs.fzzy_config.config.ConfigSection;
 import me.fzzyhmstrs.fzzy_config.validation.number.ValidatedDouble;
 import me.fzzyhmstrs.fzzy_config.validation.number.ValidatedFloat;
 import me.fzzyhmstrs.fzzy_config.validation.number.ValidatedInt;
@@ -14,7 +15,7 @@ import nl.gjorgdy.flashcarts.Flashcarts;
 import org.jspecify.annotations.NonNull;
 
 @IgnoreVisibility
-public class FzzyConfig extends Config implements iConfig {
+public class FzzyConfig extends Config implements IConfig {
 
 	public static FzzyConfig load() {
 		return ConfigApiJava.registerAndLoadConfig(FzzyConfig::new);
@@ -23,12 +24,6 @@ public class FzzyConfig extends Config implements iConfig {
 	private FzzyConfig() {
 		super(Identifier.fromNamespaceAndPath(Flashcarts.MOD_ID, "config"));
 	}
-
-	@Comment("Should TNT Minecarts also make use of the increased speed and experimental physics")
-	private boolean increaseTntMinecartSpeed = default_increaseTntMinecartSpeed;
-
-	@Comment("Maximum speed for minecarts in blocks per second, vanilla: 8")
-	private ValidatedInt maxSpeed = new ValidatedInt(default_maxSpeed, 256, 8, ValidatedNumber.WidgetType.SLIDER);
 
 	@Comment("Percentage of boost a powered rail should give, vanilla: 0.06 (6%)")
 	private ValidatedFloat poweredRailBoostPercentage = new ValidatedFloat( default_poweredRailBoostPercentage, 0.99f, 0.01f, ValidatedNumber.WidgetType.SLIDER);
@@ -39,30 +34,36 @@ public class FzzyConfig extends Config implements iConfig {
 	@Comment("Multiplier applied to speed when minecart is considered halted, vanilla: 0.5")
 	private ValidatedDouble haltSpeedMultiplier = new ValidatedDouble(default_haltSpeedMultiplier, 0.9, 0.1, ValidatedNumber.WidgetType.SLIDER);
 
-	@Comment("Should empty Minecarts also make use of the increased speed and experimental physics, default: false")
-	private boolean shouldIncreaseEmptyMinecartSpeed = default_shouldIncreaseEmptyMinecartSpeed;
+	@Comment("Configuration for empty minecarts")
+	private ICartConfig emptyMinecart = new FzzyCartConfig(true, 8);
 
-	@Comment("Should Minecarts with a mob other than a player also make use of the increased speed and experimental physics, default: true")
-	private boolean shouldIncreaseNonPlayerMinecartSpeed = default_shouldIncreaseNonPlayerMinecartSpeed;
+	@Comment("Configuration for minecarts with a mob in them")
+	private ICartConfig mobMinecart = new FzzyCartConfig(true, 8);
+
+	@Comment("Configuration for minecarts with a player in them")
+	private ICartConfig playerMinecart = new FzzyCartConfig(true, 100);
+
+	@Comment("Configuration for TNT minecarts")
+	private ICartConfig tntMinecart = new FzzyCartConfig(true, 64);
 
 	@Override
-	public boolean shouldIncreaseTntMinecartSpeed() {
-		return increaseTntMinecartSpeed;
+	public ICartConfig emptyMinecartConfig() {
+		return emptyMinecart;
 	}
 
 	@Override
-	public boolean shouldIncreaseEmptyMinecartSpeed() {
-		return shouldIncreaseEmptyMinecartSpeed;
+	public ICartConfig mobMinecartConfig() {
+		return mobMinecart;
 	}
 
 	@Override
-	public boolean shouldIncreaseNonPlayerMinecartSpeed() {
-		return shouldIncreaseNonPlayerMinecartSpeed;
+	public ICartConfig playerMinecartConfig() {
+		return playerMinecart;
 	}
 
 	@Override
-	public int getMaxSpeed() {
-		return maxSpeed.get();
+	public ICartConfig tntMinecartConfig() {
+		return tntMinecart;
 	}
 
 	@Override
@@ -83,6 +84,31 @@ public class FzzyConfig extends Config implements iConfig {
 	@Override
 	public @NonNull SaveType saveType() {
 		return SaveType.SEPARATE;
+	}
+
+	@IgnoreVisibility
+	public static class FzzyCartConfig extends ConfigSection implements ICartConfig {
+
+		@Comment("Should these minecarts make use of the increased speed and experimental physics, vanilla: false")
+		private boolean useExperimentalPhysics;
+
+		@Comment("Maximum speed for these minecarts in blocks per second, vanilla: 8")
+		private ValidatedInt maxSpeedBlocksPerSecond;
+
+		private FzzyCartConfig(boolean default_useExperimentalPhysics, int default_maxSpeed) {
+			useExperimentalPhysics = default_useExperimentalPhysics;
+			maxSpeedBlocksPerSecond = new ValidatedInt(default_maxSpeed, 256, 8, ValidatedNumber.WidgetType.SLIDER);
+		}
+
+		@Override
+		public boolean useExperimentalPhysics() {
+			return useExperimentalPhysics;
+		}
+
+		@Override
+		public int maxSpeed() {
+			return maxSpeedBlocksPerSecond.get();
+		}
 	}
 
 }

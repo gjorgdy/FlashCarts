@@ -24,7 +24,7 @@ public abstract class EntityMixin {
 
 	@Inject(method = "setOnGroundWithMovement(ZZLnet/minecraft/world/phys/Vec3;)V", at = @At("HEAD"))
 	public void onPush(boolean bl, boolean horizontalCollision, Vec3 vec3, CallbackInfo ci) {
-		if (level() instanceof ClientLevel) return;
+		if (level().isClientSide()) return;
 		if (!horizontalCollision) {
 			return;
 		}

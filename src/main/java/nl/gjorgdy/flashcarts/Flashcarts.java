@@ -4,7 +4,7 @@ import net.fabricmc.api.ModInitializer;
 import net.fabricmc.loader.api.FabricLoader;
 import nl.gjorgdy.flashcarts.config.DefaultConfig;
 import nl.gjorgdy.flashcarts.config.FzzyConfig;
-import nl.gjorgdy.flashcarts.config.iConfig;
+import nl.gjorgdy.flashcarts.config.IConfig;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -17,7 +17,7 @@ public class Flashcarts implements ModInitializer {
 
 	public static final Logger LOGGER = LogManager.getLogger("flash_carts");
 
-	public static iConfig config;
+	public static IConfig config;
 
 	@Override
 	public void onInitialize() {
