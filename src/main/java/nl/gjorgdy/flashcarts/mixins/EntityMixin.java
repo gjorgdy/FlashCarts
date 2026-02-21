@@ -1,9 +1,6 @@
 package nl.gjorgdy.flashcarts.mixins;
 
-import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.protocol.game.ClientboundClearTitlesPacket;
-import net.minecraft.network.protocol.game.ClientboundSetTitleTextPacket;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
@@ -40,12 +37,12 @@ public abstract class EntityMixin {
 	public void onDismount(CallbackInfo ci) {
 		if (level().isClientSide()) return;
 		if (this.getVehicle() instanceof Minecart && self instanceof ServerPlayer player) {
-			var speedometer = Flashcarts.config.shouldShowSpeedometer();
-			var speedBar = Flashcarts.config.shouldShowSpeedBar();
-			if (speedometer || speedBar) {
+			if (Flashcarts.config.shouldShowSpeedometer() || Flashcarts.config.shouldShowSpeedBar()) {
 				player.sendSystemMessage(Component.empty(), true);
 			}
-			TitleUtils.clearTitle(player);
+			if (Flashcarts.config.shouldShowStationTitle()) {
+				TitleUtils.clearTitle(player);
+			}
 		}
 	}
 

@@ -10,6 +10,7 @@ public interface IConfig {
 
 	boolean default_showSpeedometer = true;
 	boolean default_showSpeedBar = true;
+	boolean default_showStationTitle = true;
 
 	float default_poweredRailBoostPercentage = 0.12f;
 	double default_haltSpeedThreshold = 0.05;
@@ -34,10 +35,16 @@ public interface IConfig {
 	boolean shouldShowSpeedometer();
 
 	/**
-	 * Whether to show the speed bar (the bar with 10 segments that visually represents the current speed as a percentage of max speed).
+	 * Whether to show the speed bar (the segment bar that represents the current speed as a percentage of max speed).
 	 * @return whether to show the speed bar.
 	 */
 	boolean shouldShowSpeedBar();
+
+	/**
+	 * Whether to show the station title (the title that shows the name of the station when a minecart stops).
+	 * @return whether to show the station title.
+	 */
+	boolean shouldShowStationTitle();
 
 	/**
 	 * Get the percentage of boost a powered rail should give.

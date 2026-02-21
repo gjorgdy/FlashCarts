@@ -16,8 +16,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.util.Optional;
-
 @Mixin(AbstractMinecart.class)
 public abstract class AbstractMinecartMixin extends VehicleEntity {
 
@@ -44,7 +42,7 @@ public abstract class AbstractMinecartMixin extends VehicleEntity {
 			if (p instanceof ServerPlayer player && tickCount % 2 == 0) {
 				var speedometer = Flashcarts.config.shouldShowSpeedometer();
 				var speedBar = Flashcarts.config.shouldShowSpeedBar();
-				var stationTitle = true;
+				var stationTitle = Flashcarts.config.shouldShowStationTitle();
 				var stringBuilder = new StringBuilder();
 				if (speed > Flashcarts.config.getHaltSpeedThreshold()) {
 					if (speedBar) {

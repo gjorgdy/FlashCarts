@@ -87,6 +87,11 @@ public class DefaultConfig implements IConfig {
 	}
 
 	@Override
+	public boolean shouldShowStationTitle() {
+		return default_showStationTitle;
+	}
+
+	@Override
 	public float getPoweredRailBoostPercentage() {
 		return default_poweredRailBoostPercentage;
 	}
