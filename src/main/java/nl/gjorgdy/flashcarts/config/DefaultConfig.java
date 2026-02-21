@@ -8,36 +8,72 @@ public class DefaultConfig implements IConfig {
 		return new DefaultConfig();
 	}
 
-	private static final ICartConfig defaultMinecartConfig = new ICartConfig() {
+	private static final ICartConfig default_emptyMinecartConfig = new ICartConfig() {
 		@Override
 		public boolean useExperimentalPhysics() {
-			return true;
+			return default_emptyUseExperimentalPhysics;
 		}
 
 		@Override
 		public int maxSpeed() {
-			return default_maxSpeed;
+			return default_emptyMaxSpeed;
+		}
+	};
+
+	private static final ICartConfig default_mobMinecartConfig = new ICartConfig() {
+		@Override
+		public boolean useExperimentalPhysics() {
+			return default_mobUseExperimentalPhysics;
+		}
+
+		@Override
+		public int maxSpeed() {
+			return default_mobMaxSpeed;
+		}
+	};
+
+	private static final ICartConfig default_playerMinecartConfig = new ICartConfig() {
+		@Override
+		public boolean useExperimentalPhysics() {
+			return default_playerUseExperimentalPhysics;
+		}
+
+		@Override
+		public int maxSpeed() {
+			return default_playerMaxSpeed;
+		}
+	};
+
+	private static final ICartConfig default_tntMinecartConfig = new ICartConfig() {
+		@Override
+		public boolean useExperimentalPhysics() {
+			return default_tntUseExperimentalPhysics;
+		}
+
+		@Override
+		public int maxSpeed() {
+			return default_tntMaxSpeed;
 		}
 	};
 
 	@Override
 	public ICartConfig emptyMinecartConfig() {
-		return defaultMinecartConfig;
+		return default_emptyMinecartConfig;
 	}
 
 	@Override
 	public ICartConfig mobMinecartConfig() {
-		return defaultMinecartConfig;
+		return default_mobMinecartConfig;
 	}
 
 	@Override
 	public ICartConfig playerMinecartConfig() {
-		return defaultMinecartConfig;
+		return default_playerMinecartConfig;
 	}
 
 	@Override
 	public ICartConfig tntMinecartConfig() {
-		return defaultMinecartConfig;
+		return default_tntMinecartConfig;
 	}
 
 	@Override

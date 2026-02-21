@@ -8,13 +8,21 @@ import org.jspecify.annotations.Nullable;
 
 public interface IConfig {
 
-	boolean default_increaseTntMinecartSpeed = true;
-	int default_maxSpeed = 100;
 	float default_poweredRailBoostPercentage = 0.12f;
 	double default_haltSpeedThreshold = 0.05;
 	double default_haltSpeedMultiplier = 0.3;
-	boolean default_shouldIncreaseEmptyMinecartSpeed = false;
-	boolean default_shouldIncreaseNonPlayerMinecartSpeed = true;
+
+	boolean default_emptyUseExperimentalPhysics = true;
+	int default_emptyMaxSpeed = 8;
+
+	boolean default_mobUseExperimentalPhysics = true;
+	int default_mobMaxSpeed = 8;
+
+	boolean default_playerUseExperimentalPhysics = true;
+	int default_playerMaxSpeed = 64;
+
+	boolean default_tntUseExperimentalPhysics = true;
+	int default_tntMaxSpeed = 32;
 
 	/**
 	 * Get the configuration for empty minecarts.

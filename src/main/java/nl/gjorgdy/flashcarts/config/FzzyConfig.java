@@ -35,16 +35,16 @@ public class FzzyConfig extends Config implements IConfig {
 	private ValidatedDouble haltSpeedMultiplier = new ValidatedDouble(default_haltSpeedMultiplier, 0.9, 0.1, ValidatedNumber.WidgetType.SLIDER);
 
 	@Comment("Configuration for empty minecarts")
-	private ICartConfig emptyMinecart = new FzzyCartConfig(true, 8);
+	private ICartConfig emptyMinecart = new FzzyCartConfig(default_emptyUseExperimentalPhysics, default_emptyMaxSpeed);
 
 	@Comment("Configuration for minecarts with a mob in them")
-	private ICartConfig mobMinecart = new FzzyCartConfig(true, 8);
+	private ICartConfig mobMinecart = new FzzyCartConfig(default_mobUseExperimentalPhysics, default_mobMaxSpeed);
 
 	@Comment("Configuration for minecarts with a player in them")
-	private ICartConfig playerMinecart = new FzzyCartConfig(true, 100);
+	private ICartConfig playerMinecart = new FzzyCartConfig(default_playerUseExperimentalPhysics, default_playerMaxSpeed);
 
 	@Comment("Configuration for TNT minecarts")
-	private ICartConfig tntMinecart = new FzzyCartConfig(true, 64);
+	private ICartConfig tntMinecart = new FzzyCartConfig(default_tntUseExperimentalPhysics, default_tntMaxSpeed);
 
 	@Override
 	public ICartConfig emptyMinecartConfig() {
