@@ -17,6 +17,7 @@ public abstract class AbstractMinecartMixin extends VehicleEntity {
 
 	@Unique
 	private final AbstractMinecart self = (AbstractMinecart) (Object) this;
+
 	@Mutable
 	@Final
 	@Shadow
@@ -29,7 +30,7 @@ public abstract class AbstractMinecartMixin extends VehicleEntity {
 	@Inject(at = @At("HEAD"), method = "tick")
 	public void tick(CallbackInfo ci) {
 		getPassengers().forEach(p -> {
-			if (p instanceof ServerPlayer player) {
+			if (p instanceof ServerPlayer player && tickCount % 2 == 0) {
 				var speedometer = Flashcarts.config.shouldShowSpeedometer();
 				var speedBar = Flashcarts.config.shouldShowSpeedBar();
 				if (!speedometer && !speedBar) return;
@@ -37,12 +38,14 @@ public abstract class AbstractMinecartMixin extends VehicleEntity {
 				var speed = getSpeedBlocksPerSecond();
 				if (speed > Flashcarts.config.getHaltSpeedThreshold()) {
 					if (speedBar) {
-						int bars = (int) Math.round(speed / Flashcarts.config.getPlayerMinecartConfig().getMaxSpeed() * 10);
+						int bars = (int) Math.floor(speed / Flashcarts.config.getPlayerMinecartConfig().getMaxSpeed() * 10);
 						stringBuilder
 								.append("§a")
-								.append("▮".repeat(Math.min(bars, 5)))
+								.append("▮".repeat(Math.min(bars, 6)))
 								.append("§e")
-								.append("▮".repeat(Math.clamp(bars - 6, 0, 3)))
+								.append("▮".repeat(Math.clamp(bars - 6, 0, 2)))
+								.append("§6")
+								.append("▮".repeat(Math.clamp(bars - 8, 0, 1)))
 								.append("§c")
 								.append("▮".repeat(Math.clamp(bars - 9, 0, 1)))
 								.append("§7")
@@ -64,6 +67,7 @@ public abstract class AbstractMinecartMixin extends VehicleEntity {
 				player.sendSystemMessage(Component.literal(stringBuilder.toString()), true);
 			}
 		});
+		if (tickCount % 5 != 0) return;
 		var cartConfig = Flashcarts.config.getConfigForMinecart(self);
 		if (cartConfig != null && cartConfig.shouldUseExperimentalPhysics()) {
 			setNewMinecartBehavior();
