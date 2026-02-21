@@ -8,21 +8,15 @@ import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundMoveMinecartPacket;
 import net.minecraft.server.level.ServerEntity;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.vehicle.minecart.AbstractMinecart;
 import net.minecraft.world.entity.vehicle.minecart.Minecart;
-import net.minecraft.world.entity.vehicle.minecart.NewMinecartBehavior;
 import net.minecraft.world.entity.vehicle.minecart.OldMinecartBehavior;
-import net.minecraft.world.level.block.BaseRailBlock;
 import nl.gjorgdy.flashcarts.interfaces.IMinecartLerpContainer;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
-
-import java.util.List;
 
 @Mixin(ServerEntity.class)
 public abstract class ServerEntityMixin {
@@ -30,17 +24,11 @@ public abstract class ServerEntityMixin {
 	@Final
 	@Shadow
 	private ServerEntity.Synchronizer synchronizer;
-	@Final
-	@Shadow
-	private ServerLevel level;
 
 	@Shadow
 	@Final
 	private Entity entity;
-//	@Unique
-//	private NewMinecartBehavior.MinecartStep previousStep = null;
 
-	// TODO : test if this works
 	@WrapOperation(method = "sendChanges", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerEntity$Synchronizer;sendToTrackingPlayers(Lnet/minecraft/network/protocol/Packet;)V"))
 	private void cancelUpdate(ServerEntity.Synchronizer instance, Packet<? super ClientGamePacketListener> packet, Operation<Void> original) {
 		if (this.entity instanceof Minecart minecart && minecart.getBehavior() instanceof OldMinecartBehavior) {
