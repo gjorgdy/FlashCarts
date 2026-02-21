@@ -1,22 +1,32 @@
 package nl.gjorgdy.flashcarts.mixins;
 
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.vehicle.VehicleEntity;
 import net.minecraft.world.entity.vehicle.minecart.*;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.SignBlockEntity;
 import nl.gjorgdy.flashcarts.Flashcarts;
+import nl.gjorgdy.flashcarts.utils.TitleUtils;
+import org.jspecify.annotations.Nullable;
 import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+import java.util.Optional;
 
 @Mixin(AbstractMinecart.class)
 public abstract class AbstractMinecartMixin extends VehicleEntity {
 
 	@Unique
 	private final AbstractMinecart self = (AbstractMinecart) (Object) this;
+
+	@Unique
+	@Nullable
+	private BlockPos standingStillAt = null;
 
 	@Mutable
 	@Final
@@ -29,13 +39,13 @@ public abstract class AbstractMinecartMixin extends VehicleEntity {
 
 	@Inject(at = @At("HEAD"), method = "tick")
 	public void tick(CallbackInfo ci) {
+		var speed = getSpeedBlocksPerSecond();
 		getPassengers().forEach(p -> {
 			if (p instanceof ServerPlayer player && tickCount % 2 == 0) {
 				var speedometer = Flashcarts.config.shouldShowSpeedometer();
 				var speedBar = Flashcarts.config.shouldShowSpeedBar();
-				if (!speedometer && !speedBar) return;
+				var stationTitle = true;
 				var stringBuilder = new StringBuilder();
-				var speed = getSpeedBlocksPerSecond();
 				if (speed > Flashcarts.config.getHaltSpeedThreshold()) {
 					if (speedBar) {
 						int bars = (int) Math.floor(speed / Flashcarts.config.getPlayerMinecartConfig().getMaxSpeed() * 10);
@@ -54,6 +64,9 @@ public abstract class AbstractMinecartMixin extends VehicleEntity {
 					if (speedometer) {
 						stringBuilder.append(String.format(" %,6.2f b/s", speed));
 					}
+					if (stationTitle && standingStillAt != null && standingStillAt.equals(self.blockPosition())) {
+						TitleUtils.clearTitle(player);
+					}
 				} else {
 					if (speedBar) {
 						stringBuilder
@@ -63,11 +76,20 @@ public abstract class AbstractMinecartMixin extends VehicleEntity {
 					if (speedometer) {
 						stringBuilder.append(String.format(" %,6.2f b/s", 0f));
 					}
+					if (stationTitle && standingStillAt != null && !standingStillAt.equals(self.blockPosition())) {
+						if (self.level().getBlockEntity(self.blockPosition().below().below()) instanceof SignBlockEntity sign) {
+							TitleUtils.sendTitle(player, sign);
+						}
+					}
+					standingStillAt = self.blockPosition();
 				}
-				player.sendSystemMessage(Component.literal(stringBuilder.toString()), true);
+				if (!stringBuilder.isEmpty()) {
+					player.sendSystemMessage(Component.literal(stringBuilder.toString()), true);
+				}
 			}
 		});
 		if (tickCount % 5 != 0) return;
+		// check if minecart should switch physics behavior
 		var cartConfig = Flashcarts.config.getConfigForMinecart(self);
 		if (cartConfig != null && cartConfig.shouldUseExperimentalPhysics()) {
 			setNewMinecartBehavior();
