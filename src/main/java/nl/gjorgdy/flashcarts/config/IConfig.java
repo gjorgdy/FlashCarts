@@ -8,6 +8,9 @@ import org.jspecify.annotations.Nullable;
 
 public interface IConfig {
 
+	boolean default_showSpeedometer = true;
+	boolean default_showSpeedBar = true;
+
 	float default_poweredRailBoostPercentage = 0.12f;
 	double default_haltSpeedThreshold = 0.05;
 	double default_haltSpeedMultiplier = 0.3;
@@ -23,6 +26,36 @@ public interface IConfig {
 
 	boolean default_tntUseExperimentalPhysics = true;
 	int default_tntMaxSpeed = 32;
+
+	/**
+	 * Whether to show the speedometer (the text that shows the current speed in blocks per second).
+	 * @return whether to show the speedometer.
+	 */
+	boolean shouldShowSpeedometer();
+
+	/**
+	 * Whether to show the speed bar (the bar with 10 segments that visually represents the current speed as a percentage of max speed).
+	 * @return whether to show the speed bar.
+	 */
+	boolean shouldShowSpeedBar();
+
+	/**
+	 * Get the percentage of boost a powered rail should give.
+	 * @return the percentage of boost a powered rail should give.
+	 */
+	float getPoweredRailBoostPercentage();
+
+	/**
+	 * Get the speed threshold below which a minecart is considered halted.
+	 * @return the speed threshold below which a minecart is considered halted.
+	 */
+	double getHaltSpeedThreshold();
+
+	/**
+	 * Get the multiplier applied to speed when a minecart is being halted.
+	 * @return the multiplier applied to speed when a minecart is being halted.
+	 */
+	double getHaltSpeedMultiplier();
 
 	/**
 	 * Get the configuration for empty minecarts.
@@ -58,23 +91,5 @@ public interface IConfig {
 		}
 		return null;
 	}
-
-	/**
-	 * Get the percentage of boost a powered rail should give.
-	 * @return the percentage of boost a powered rail should give.
-	 */
-	float getPoweredRailBoostPercentage();
-
-	/**
-	 * Get the speed threshold below which a minecart is considered halted.
-	 * @return the speed threshold below which a minecart is considered halted.
-	 */
-	double getHaltSpeedThreshold();
-
-	/**
-	 * Get the multiplier applied to speed when a minecart is being halted.
-	 * @return the multiplier applied to speed when a minecart is being halted.
-	 */
-	double getHaltSpeedMultiplier();
 
 }

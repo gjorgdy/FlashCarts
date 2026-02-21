@@ -30,18 +30,38 @@ public abstract class AbstractMinecartMixin extends VehicleEntity {
 	public void tick(CallbackInfo ci) {
 		getPassengers().forEach(p -> {
 			if (p instanceof ServerPlayer player) {
+				var speedometer = Flashcarts.config.shouldShowSpeedometer();
+				var speedBar = Flashcarts.config.shouldShowSpeedBar();
+				if (!speedometer && !speedBar) return;
+				var stringBuilder = new StringBuilder();
 				var speed = getSpeedBlocksPerSecond();
 				if (speed > Flashcarts.config.getHaltSpeedThreshold()) {
-					int bars = (int) Math.round(speed / Flashcarts.config.getPlayerMinecartConfig().getMaxSpeed() * 10);
-					String barString = "§a" + "▮".repeat(Math.min(bars, 7))
-							   + "§e" + "▮".repeat(Math.min(Math.max(bars - 7, 0), 2))
-							   + "§c" + "▮".repeat(Math.max(bars - 9, 0))
-							   + "§7" + "▮".repeat(10 - bars);
-					player.sendSystemMessage(Component.literal(barString + String.format(" %.2f", speed) + " b/s"), true);
+					if (speedBar) {
+						int bars = (int) Math.round(speed / Flashcarts.config.getPlayerMinecartConfig().getMaxSpeed() * 10);
+						stringBuilder
+								.append("§a")
+								.append("▮".repeat(Math.min(bars, 5)))
+								.append("§e")
+								.append("▮".repeat(Math.clamp(bars - 6, 0, 3)))
+								.append("§c")
+								.append("▮".repeat(Math.clamp(bars - 9, 0, 1)))
+								.append("§7")
+								.append("▮".repeat(10 - bars));
+					}
+					if (speedometer) {
+						stringBuilder.append(String.format(" %,6.2f b/s", speed));
+					}
 				} else {
-					String barString = "§7" + "▮".repeat(10);
-					player.sendSystemMessage(Component.literal(barString + " 0.00 b/s"), true);
+					if (speedBar) {
+						stringBuilder
+							.append("§7")
+							.append("▮".repeat(10));
+					}
+					if (speedometer) {
+						stringBuilder.append(String.format(" %,6.2f b/s", 0f));
+					}
 				}
+				player.sendSystemMessage(Component.literal(stringBuilder.toString()), true);
 			}
 		});
 		var cartConfig = Flashcarts.config.getConfigForMinecart(self);

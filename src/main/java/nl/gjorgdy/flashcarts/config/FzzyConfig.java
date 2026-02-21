@@ -25,6 +25,12 @@ public class FzzyConfig extends Config implements IConfig {
 		super(Identifier.fromNamespaceAndPath(Flashcarts.MOD_ID, "config"));
 	}
 
+	@Comment("Whether to show the speedometer when in minecart (current speed in blocks per second), vanilla: false")
+	private boolean showSpeedometer = default_showSpeedometer;
+
+	@Comment("Whether to show the speed bar when in minecart (bars up to max speed), vanilla: false")
+	private boolean showSpeedBar = default_showSpeedBar;
+
 	@Comment("Percentage of boost a powered rail should give, vanilla: 0.06 (6%)")
 	private ValidatedFloat poweredRailBoostPercentage = new ValidatedFloat( default_poweredRailBoostPercentage, 0.99f, 0.01f, ValidatedNumber.WidgetType.SLIDER);
 
@@ -64,6 +70,16 @@ public class FzzyConfig extends Config implements IConfig {
 	@Override
 	public ICartConfig getTntMinecartConfig() {
 		return tntMinecart;
+	}
+
+	@Override
+	public boolean shouldShowSpeedometer() {
+		return showSpeedometer;
+	}
+
+	@Override
+	public boolean shouldShowSpeedBar() {
+		return showSpeedBar;
 	}
 
 	@Override

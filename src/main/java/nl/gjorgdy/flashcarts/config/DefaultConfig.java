@@ -77,6 +77,16 @@ public class DefaultConfig implements IConfig {
 	}
 
 	@Override
+	public boolean shouldShowSpeedometer() {
+		return default_showSpeedometer;
+	}
+
+	@Override
+	public boolean shouldShowSpeedBar() {
+		return default_showSpeedBar;
+	}
+
+	@Override
 	public float getPoweredRailBoostPercentage() {
 		return default_poweredRailBoostPercentage;
 	}
