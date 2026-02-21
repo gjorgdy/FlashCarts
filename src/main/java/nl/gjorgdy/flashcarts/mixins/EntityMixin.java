@@ -41,7 +41,7 @@ public abstract class EntityMixin {
 				player.sendSystemMessage(Component.empty(), true);
 			}
 			if (Flashcarts.config.shouldShowStationTitle()) {
-				TitleUtils.clearTitle(player);
+				TitleUtils.clearTitle(player, true);
 			}
 		}
 	}

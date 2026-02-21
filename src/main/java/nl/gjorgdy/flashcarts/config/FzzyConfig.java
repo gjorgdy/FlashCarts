@@ -31,7 +31,7 @@ public class FzzyConfig extends Config implements IConfig {
 	@Comment("Whether to show the speed bar when in minecart (bars up to max speed), vanilla: false")
 	private boolean showSpeedBar = default_showSpeedBar;
 
-	@Comment("Whether to show the station title (title when stopping a minecart at a block with a sign under it), vanilla: false")
+	@Comment("Whether to show the station title (title when standing still at a block with a sign under it), vanilla: false")
 	private boolean showStationTitle = default_showStationTitle;
 
 	@Comment("Percentage of boost a powered rail should give, vanilla: 0.06 (6%)")

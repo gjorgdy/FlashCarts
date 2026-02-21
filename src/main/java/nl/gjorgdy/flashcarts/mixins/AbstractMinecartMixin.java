@@ -23,8 +23,7 @@ public abstract class AbstractMinecartMixin extends VehicleEntity {
 	private final AbstractMinecart self = (AbstractMinecart) (Object) this;
 
 	@Unique
-	@Nullable
-	private BlockPos standingStillAt = null;
+	private boolean standingStill = false;
 
 	@Mutable
 	@Final
@@ -62,8 +61,9 @@ public abstract class AbstractMinecartMixin extends VehicleEntity {
 					if (speedometer) {
 						stringBuilder.append(String.format(" %,6.2f b/s", speed));
 					}
-					if (stationTitle && standingStillAt != null && standingStillAt.equals(self.blockPosition())) {
-						TitleUtils.clearTitle(player);
+					if (stationTitle && standingStill) {
+						TitleUtils.clearTitle(player, false);
+						standingStill = false;
 					}
 				} else {
 					if (speedBar) {
@@ -74,12 +74,10 @@ public abstract class AbstractMinecartMixin extends VehicleEntity {
 					if (speedometer) {
 						stringBuilder.append(String.format(" %,6.2f b/s", 0f));
 					}
-					if (stationTitle && standingStillAt != null && !standingStillAt.equals(self.blockPosition())) {
-						if (self.level().getBlockEntity(self.blockPosition().below().below()) instanceof SignBlockEntity sign) {
-							TitleUtils.sendTitle(player, sign);
-						}
+					if (stationTitle && self.level().getBlockEntity(self.blockPosition().below().below()) instanceof SignBlockEntity sign) {
+						TitleUtils.sendTitle(player, sign, standingStill);
 					}
-					standingStillAt = self.blockPosition();
+					standingStill = true;
 				}
 				if (!stringBuilder.isEmpty()) {
 					player.sendSystemMessage(Component.literal(stringBuilder.toString()), true);

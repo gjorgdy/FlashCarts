@@ -12,11 +12,11 @@ import java.util.Arrays;
 
 public abstract class TitleUtils {
 
-    public static void clearTitle(ServerPlayer player) {
-        player.connection.send(new ClientboundSetTitlesAnimationPacket(0, 0, 10));
+    public static void clearTitle(ServerPlayer player, boolean instant) {
+        player.connection.send(new ClientboundSetTitlesAnimationPacket(0, 0, instant ? 0 : 10));
     }
 
-    public static void sendTitle(ServerPlayer player, SignBlockEntity sign) {
+    public static void sendTitle(ServerPlayer player, SignBlockEntity sign, boolean reapply) {
         var lines = Arrays.stream(sign.getText(true).getMessages(false))
                 .map(Component::getString)
                 .filter(s -> !s.isBlank())
@@ -24,7 +24,7 @@ public abstract class TitleUtils {
         var signColor = sign.getText(true).getColor();
         var color = signColor == DyeColor.BLACK ? DyeColor.WHITE.getTextColor() : signColor.getTextColor();
         if (!lines.isEmpty()) {
-            player.connection.send(new ClientboundSetTitlesAnimationPacket(20, 60, 20));
+            player.connection.send(new ClientboundSetTitlesAnimationPacket(reapply ? 0 : 20, 60, 20));
             player.connection.send(
                     new ClientboundSetTitleTextPacket(
                             Component.literal(lines.getFirst()).withColor(color)
