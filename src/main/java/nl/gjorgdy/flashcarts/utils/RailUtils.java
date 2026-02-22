@@ -13,6 +13,13 @@ import net.minecraft.world.level.block.PoweredRailBlock;
 import net.minecraft.world.level.block.RailBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.RailShape;
+import nl.gjorgdy.flashcarts.Flashcarts;
+import org.jspecify.annotations.Nullable;
+
+import java.util.LinkedList;
+import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.function.Function;
 
 public abstract class RailUtils {
 
@@ -52,6 +59,35 @@ public abstract class RailUtils {
             movedVertically = false;
         }
         return forward(world, player, vec, railItem, pos, xAxisRails, depth - 1, movedVertically);
+    }
+
+    @Nullable
+    public static List<BlockPos> getRailPath(Level level, BlockPos startPos, BlockPos endPos) {
+        // if coords differ on both axis, return null
+        if (startPos.getX() != endPos.getX() && startPos.getZ() != endPos.getZ()) return null;
+
+        Vec3i step;
+        if (startPos.getX() != endPos.getX()) {
+            step = new Vec3i(Integer.signum(endPos.getX() - startPos.getX()), 0, 0);
+        } else {
+            step = new Vec3i(0, 0, Integer.signum(endPos.getZ() - startPos.getZ()));
+        }
+
+        var path = new LinkedList<BlockPos>();
+        var currentPos = new BlockPos(startPos);
+
+        int maxDepth = Flashcarts.config.getBuildConfig().getRailSelectionBuildingMaxDistance();
+        while (!currentPos.equals(endPos)) {
+            currentPos = currentPos.offset(step);
+            var blockState = level.getBlockState(currentPos);
+            if (!(blockState.getBlock() instanceof BaseRailBlock) && !blockState.isAir()) return null;
+            path.add(currentPos);
+//            System.out.println(currentPos);
+            maxDepth--;
+            if (maxDepth < 0) return null;
+        }
+
+        return path;
     }
 
     private static boolean isXAxis(RailShape shape) {

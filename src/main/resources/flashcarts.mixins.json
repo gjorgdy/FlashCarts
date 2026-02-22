@@ -13,6 +13,7 @@
     "OldMinecartBehaviorMixin",
     "ServerConfigurationPacketListenerImplMixin",
     "ServerEntityMixin",
+    "ServerPlayerMixin",
     "VehicleEntityInvoker"
   ],
   "client": [
