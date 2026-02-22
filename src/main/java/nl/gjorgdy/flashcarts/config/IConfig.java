@@ -12,6 +12,11 @@ public interface IConfig {
 	boolean default_showSpeedBar = true;
 	boolean default_showStationTitle = true;
 
+	boolean default_railSelectionBuildingEnabled = true;
+	int default_railSelectionBuildingMaxDistance = 64;
+	boolean default_railExtendBuildingEnabled = true;
+	int default_railExtendBuildingMaxDistance = 16;
+
 	float default_poweredRailBoostPercentage = 0.12f;
 	double default_haltSpeedThreshold = 0.05;
 	double default_haltSpeedMultiplier = 0.3;
@@ -63,6 +68,12 @@ public interface IConfig {
 	 * @return the multiplier applied to speed when a minecart is being halted.
 	 */
 	double getHaltSpeedMultiplier();
+
+	/**
+	 * Get the configuration for building tools.
+	 * @return the configuration for building tools.
+	 */
+	IBuildConfig getBuildConfig();
 
 	/**
 	 * Get the configuration for empty minecarts.

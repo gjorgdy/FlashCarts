@@ -8,6 +8,33 @@ public class DefaultConfig implements IConfig {
 		return new DefaultConfig();
 	}
 
+	private static final IBuildConfig default_buildConfig = new IBuildConfig() {
+		@Override
+		public boolean isRailSelectionBuildingEnabled() {
+			return default_railSelectionBuildingEnabled;
+		}
+
+		@Override
+		public int getRailSelectionBuildingMaxDistance() {
+			return default_railSelectionBuildingMaxDistance;
+		}
+
+		@Override
+		public boolean isRailExtendBuildingEnabled() {
+			return default_railExtendBuildingEnabled;
+		}
+
+		@Override
+		public int getRailExtendBuildingMaxDistance() {
+			return default_railExtendBuildingMaxDistance;
+		}
+	};
+
+	@Override
+	public IBuildConfig getBuildConfig() {
+		return default_buildConfig;
+	}
+
 	private static final ICartConfig default_emptyMinecartConfig = new ICartConfig() {
 		@Override
 		public boolean shouldUseExperimentalPhysics() {
@@ -105,4 +132,5 @@ public class DefaultConfig implements IConfig {
 	public double getHaltSpeedMultiplier() {
 		return default_haltSpeedMultiplier;
 	}
+
 }

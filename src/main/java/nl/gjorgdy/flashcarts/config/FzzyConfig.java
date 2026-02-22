@@ -43,17 +43,20 @@ public class FzzyConfig extends Config implements IConfig {
 	@Comment("Multiplier applied to speed when minecart is considered halted, vanilla: 0.5")
 	private ValidatedDouble haltSpeedMultiplier = new ValidatedDouble(default_haltSpeedMultiplier, 0.9, 0.1, ValidatedNumber.WidgetType.SLIDER);
 
+	@Comment("Configuration for building tools")
+	private FzzyBuildConfig buildTools = new FzzyBuildConfig();
+
 	@Comment("Configuration for empty minecarts")
-	private ICartConfig emptyMinecart = new FzzyCartConfig(default_emptyUseExperimentalPhysics, default_emptyMaxSpeed);
+	private FzzyCartConfig emptyMinecart = new FzzyCartConfig(default_emptyUseExperimentalPhysics, default_emptyMaxSpeed);
 
 	@Comment("Configuration for minecarts with a mob in them")
-	private ICartConfig mobMinecart = new FzzyCartConfig(default_mobUseExperimentalPhysics, default_mobMaxSpeed);
+	private FzzyCartConfig mobMinecart = new FzzyCartConfig(default_mobUseExperimentalPhysics, default_mobMaxSpeed);
 
 	@Comment("Configuration for minecarts with a player in them")
-	private ICartConfig playerMinecart = new FzzyCartConfig(default_playerUseExperimentalPhysics, default_playerMaxSpeed);
+	private FzzyCartConfig playerMinecart = new FzzyCartConfig(default_playerUseExperimentalPhysics, default_playerMaxSpeed);
 
 	@Comment("Configuration for TNT minecarts")
-	private ICartConfig tntMinecart = new FzzyCartConfig(default_tntUseExperimentalPhysics, default_tntMaxSpeed);
+	private FzzyCartConfig tntMinecart = new FzzyCartConfig(default_tntUseExperimentalPhysics, default_tntMaxSpeed);
 
 	@Override
 	public ICartConfig getEmptyMinecartConfig() {
@@ -106,12 +109,17 @@ public class FzzyConfig extends Config implements IConfig {
 	}
 
 	@Override
+	public IBuildConfig getBuildConfig() {
+		return buildTools;
+	}
+
+	@Override
 	public @NonNull SaveType saveType() {
 		return SaveType.SEPARATE;
 	}
 
 	@IgnoreVisibility
-	public static class FzzyCartConfig extends ConfigSection implements ICartConfig {
+	private static class FzzyCartConfig extends ConfigSection implements ICartConfig {
 
 		@Comment("Should these minecarts make use of the increased speed and experimental physics, vanilla: false")
 		private boolean useExperimentalPhysics;
@@ -132,6 +140,42 @@ public class FzzyConfig extends Config implements IConfig {
 		@Override
 		public int getMaxSpeed() {
 			return maxSpeedBlocksPerSecond.get();
+		}
+	}
+
+	@IgnoreVisibility
+	private static class FzzyBuildConfig extends ConfigSection implements IBuildConfig {
+
+		@Comment("Whether to enable rail selection building, default: " + default_railSelectionBuildingEnabled)
+		private boolean railSelectionBuilding = default_railSelectionBuildingEnabled;
+
+		@Comment("How far from the starting point selections should work, default: " + default_railSelectionBuildingMaxDistance)
+		private ValidatedInt railSelectionBuildingMaxDistance = new ValidatedInt(default_railSelectionBuildingMaxDistance, 96, 8, ValidatedNumber.WidgetType.SLIDER);
+
+		@Comment("Whether to enable rail extending building, default: " + default_railExtendBuildingEnabled)
+		private boolean railExtendBuilding = default_railExtendBuildingEnabled;
+
+		@Comment("How far from the player rail is able to be extended, default: " + default_railExtendBuildingMaxDistance)
+		private ValidatedInt railExtendBuildingMaxDistance = new ValidatedInt(default_railExtendBuildingMaxDistance, 96, 8, ValidatedNumber.WidgetType.SLIDER);
+
+		@Override
+		public boolean isRailSelectionBuildingEnabled() {
+			return railSelectionBuilding;
+		}
+
+		@Override
+		public int getRailSelectionBuildingMaxDistance() {
+			return railSelectionBuildingMaxDistance.get();
+		}
+
+		@Override
+		public boolean isRailExtendBuildingEnabled() {
+			return railExtendBuilding;
+		}
+
+		@Override
+		public int getRailExtendBuildingMaxDistance() {
+			return railExtendBuildingMaxDistance.get();
 		}
 	}
 
