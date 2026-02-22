@@ -6,14 +6,14 @@ import net.minecraft.core.Vec3i;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.BaseRailBlock;
-import net.minecraft.world.level.block.PoweredRailBlock;
-import net.minecraft.world.level.block.RailBlock;
+import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.RailShape;
 import nl.gjorgdy.flashcarts.Flashcarts;
+import nl.gjorgdy.flashcarts.mixins.BaseRailBlockInvoker;
 import org.jspecify.annotations.Nullable;
 
 import java.util.LinkedList;
@@ -64,7 +64,9 @@ public abstract class RailUtils {
     @Nullable
     public static List<BlockPos> getRailPath(Level level, BlockPos startPos, BlockPos endPos) {
         // if coords differ on both axis, return null
-        if (startPos.getX() != endPos.getX() && startPos.getZ() != endPos.getZ()) return null;
+        if (startPos.getX() != endPos.getX() && startPos.getZ() != endPos.getZ() ) return null;
+        int maxDist = Flashcarts.config.getBuildConfig().getRailSelectionBuildingMaxDistance();
+        if (startPos.equals(endPos) || startPos.distChessboard(endPos) > maxDist) return null;
 
         Vec3i step;
         if (startPos.getX() != endPos.getX()) {
@@ -72,22 +74,32 @@ public abstract class RailUtils {
         } else {
             step = new Vec3i(0, 0, Integer.signum(endPos.getZ() - startPos.getZ()));
         }
-
         var path = new LinkedList<BlockPos>();
         var currentPos = new BlockPos(startPos);
-
-        int maxDepth = Flashcarts.config.getBuildConfig().getRailSelectionBuildingMaxDistance();
         while (!currentPos.equals(endPos)) {
             currentPos = currentPos.offset(step);
-            var blockState = level.getBlockState(currentPos);
-            if (!(blockState.getBlock() instanceof BaseRailBlock) && !blockState.isAir()) return null;
+            if (!canBePlaced(level, currentPos)) {
+                if (canBePlaced(level, currentPos.above())) {
+                    currentPos = currentPos.above();
+                } else if (canBePlaced(level, currentPos.below())) {
+                    currentPos = currentPos.below();
+                } else return null;
+            }
             path.add(currentPos);
-//            System.out.println(currentPos);
-            maxDepth--;
-            if (maxDepth < 0) return null;
+
+            maxDist--;
+            if (maxDist < 0) return null;
         }
 
         return path;
+    }
+
+    private static boolean canBePlaced(Level level, BlockPos pos) {
+        if (Blocks.RAIL instanceof BaseRailBlockInvoker invoker) {
+            return level.getBlockState(pos).canBeReplaced()
+                    && invoker.flashCarts$canSurvive(Blocks.RAIL.defaultBlockState(), level, pos);
+        }
+        return false;
     }
 
     private static boolean isXAxis(RailShape shape) {
