@@ -1,10 +1,12 @@
 package nl.gjorgdy.flashcarts;
 
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.fabricmc.loader.api.FabricLoader;
 import nl.gjorgdy.flashcarts.config.DefaultConfig;
 import nl.gjorgdy.flashcarts.config.FzzyConfig;
 import nl.gjorgdy.flashcarts.config.IConfig;
+import nl.gjorgdy.flashcarts.listeners.UseBlockCallbackListener;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -21,6 +23,8 @@ public class Flashcarts implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
+		UseBlockCallback.EVENT.register(new UseBlockCallbackListener());
+
 		FabricLoader.getInstance().getModContainer(MOD_ID).ifPresent(mod -> {
 			VERSION = mod.getMetadata().getVersion().getFriendlyString();
 		});
