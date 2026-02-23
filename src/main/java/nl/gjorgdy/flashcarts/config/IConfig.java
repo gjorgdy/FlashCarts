@@ -8,6 +8,8 @@ import org.jspecify.annotations.Nullable;
 
 public interface IConfig {
 
+	boolean default_cheaperRecipes = true;
+
 	boolean default_showSpeedometer = true;
 	boolean default_showSpeedBar = true;
 	boolean default_showStationTitle = true;
@@ -32,6 +34,12 @@ public interface IConfig {
 
 	boolean default_tntUseExperimentalPhysics = true;
 	int default_tntMaxSpeed = 32;
+
+	/**
+	 * Whether to enable cheaper recipes for rails and minecarts.
+	 * @return whether to enable cheaper recipes.
+	 */
+	boolean areCheaperRecipesEnabled();
 
 	/**
 	 * Whether to show the speedometer (the text that shows the current speed in blocks per second).

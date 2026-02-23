@@ -1,0 +1,24 @@
+﻿{
+  "fabric:load_conditions": [
+    {
+      "condition": "flash_carts:config",
+      "values": []
+    }
+  ],
+  "type": "minecraft:crafting_shaped",
+  "group": "activator_rail",
+  "category": "redstone",
+  "pattern": [
+    "RRR",
+    "RTR",
+    "RRR"
+  ],
+  "key": {
+    "R": "minecraft:rail",
+    "T": "minecraft:redstone_torch"
+  },
+  "result": {
+    "id": "minecraft:activator_rail",
+    "count": 8
+  }
+}

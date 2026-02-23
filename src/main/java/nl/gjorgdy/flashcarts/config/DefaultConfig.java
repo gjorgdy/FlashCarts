@@ -104,6 +104,11 @@ public class DefaultConfig implements IConfig {
 	}
 
 	@Override
+	public boolean areCheaperRecipesEnabled() {
+		return default_cheaperRecipes;
+	}
+
+	@Override
 	public boolean shouldShowSpeedometer() {
 		return default_showSpeedometer;
 	}

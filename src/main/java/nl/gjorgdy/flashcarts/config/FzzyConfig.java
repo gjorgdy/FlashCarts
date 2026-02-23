@@ -25,6 +25,9 @@ public class FzzyConfig extends Config implements IConfig {
 		super(Identifier.fromNamespaceAndPath(Flashcarts.MOD_ID, "config"));
 	}
 
+	@Comment("Whether to enable cheaper and alternative recipes for rails, vanilla: false")
+	private boolean cheaperRecipes = default_cheaperRecipes;
+
 	@Comment("Whether to show the speedometer when in minecart (current speed in blocks per second), vanilla: false")
 	private boolean showSpeedometer = default_showSpeedometer;
 
@@ -57,6 +60,11 @@ public class FzzyConfig extends Config implements IConfig {
 
 	@Comment("Configuration for TNT minecarts")
 	private FzzyCartConfig tntMinecart = new FzzyCartConfig(default_tntUseExperimentalPhysics, default_tntMaxSpeed);
+
+	@Override
+	public boolean areCheaperRecipesEnabled() {
+		return cheaperRecipes;
+	}
 
 	@Override
 	public ICartConfig getEmptyMinecartConfig() {

@@ -1,0 +1,24 @@
+{
+  "fabric:load_conditions": [
+    {
+      "condition": "flash_carts:config",
+      "values": []
+    }
+  ],
+  "type": "minecraft:crafting_shaped",
+  "group": "rail",
+  "category": "misc",
+  "key": {
+    "#": "minecraft:stick",
+    "X": "minecraft:copper_ingot"
+  },
+  "pattern": [
+    "X X",
+    "X#X",
+    "X X"
+  ],
+  "result": {
+    "count": 8,
+    "id": "minecraft:rail"
+  }
+}

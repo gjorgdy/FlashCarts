@@ -1,0 +1,24 @@
+﻿{
+  "fabric:load_conditions": [
+    {
+      "condition": "flash_carts:config",
+      "values": []
+    }
+  ],
+  "type": "minecraft:crafting_shaped",
+  "group": "detector_rail",
+  "category": "redstone",
+  "pattern": [
+    "RRR",
+    "RPR",
+    "RRR"
+  ],
+  "key": {
+    "R": "minecraft:rail",
+    "P": "minecraft:stone_pressure_plate"
+  },
+  "result": {
+    "id": "minecraft:detector_rail",
+    "count": 8
+  }
+}
