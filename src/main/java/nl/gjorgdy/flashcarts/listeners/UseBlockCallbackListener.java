@@ -1,12 +1,14 @@
 package nl.gjorgdy.flashcarts.listeners;
 
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseRailBlock;
 import net.minecraft.world.phys.BlockHitResult;
@@ -59,14 +61,19 @@ public class UseBlockCallbackListener implements UseBlockCallback {
                     player.displayClientMessage(Component.literal("§cNo valid rail path found!"), true);
                     return InteractionResult.FAIL;
                 } else {
-                    path.forEach(pos ->
-                        ItemUtils.place(player.getItemInHand(interactionHand), player, pos, SoundEvents.METAL_PLACE)
-                    );
+                    int i = 1;
+                    int prf = Flashcarts.config.getBuildConfig().getPoweredRailFrequency();
+                    for (BlockPos blockPos : path) {
+                        var rail = (prf != 0 && i % prf == 0) ? Items.POWERED_RAIL : Items.RAIL;
+                        boolean placed = ItemUtils.place(rail, player, blockPos, SoundEvents.METAL_PLACE);
+                        if (!placed) break;
+                        i++;
+                    }
                 }
 
                 player.displayClientMessage(Component.literal("§aStart point found; " + selectionHolder.flashCarts$getStartPointPos()), true);
                 selectionHolder.flashCarts$clearStartPoint();
-                return InteractionResult.CONSUME;
+                return InteractionResult.SUCCESS;
             }
         }
         return InteractionResult.PASS;

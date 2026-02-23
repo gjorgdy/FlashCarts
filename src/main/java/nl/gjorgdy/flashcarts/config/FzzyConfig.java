@@ -158,13 +158,16 @@ public class FzzyConfig extends Config implements IConfig {
 		private boolean railSelectionBuilding = default_railSelectionBuildingEnabled;
 
 		@Comment("How far from the starting point selections should work, default: " + default_railSelectionBuildingMaxDistance)
-		private ValidatedInt railSelectionBuildingMaxDistance = new ValidatedInt(default_railSelectionBuildingMaxDistance, 96, 8, ValidatedNumber.WidgetType.SLIDER);
+		private ValidatedInt railSelectionBuildingMaxDistance = new ValidatedInt(default_railSelectionBuildingMaxDistance, 96, 8, ValidatedNumber.WidgetType.TEXTBOX);
+
+		@Comment("How often a powered rail should be placed, set to 0 to disable, default: " + default_poweredRailFrequency)
+		private ValidatedInt poweredRailFrequency = new ValidatedInt(default_poweredRailFrequency, 32, 0, ValidatedNumber.WidgetType.TEXTBOX);
 
 		@Comment("Whether to enable rail extending building, default: " + default_railExtendBuildingEnabled)
 		private boolean railExtendBuilding = default_railExtendBuildingEnabled;
 
 		@Comment("How far from the player rail is able to be extended, default: " + default_railExtendBuildingMaxDistance)
-		private ValidatedInt railExtendBuildingMaxDistance = new ValidatedInt(default_railExtendBuildingMaxDistance, 96, 8, ValidatedNumber.WidgetType.SLIDER);
+		private ValidatedInt railExtendBuildingMaxDistance = new ValidatedInt(default_railExtendBuildingMaxDistance, 96, 8, ValidatedNumber.WidgetType.TEXTBOX);
 
 		@Override
 		public boolean isRailSelectionBuildingEnabled() {
@@ -174,6 +177,11 @@ public class FzzyConfig extends Config implements IConfig {
 		@Override
 		public int getRailSelectionBuildingMaxDistance() {
 			return railSelectionBuildingMaxDistance.get();
+		}
+
+		@Override
+		public int getPoweredRailFrequency() {
+			return poweredRailFrequency.get();
 		}
 
 		@Override

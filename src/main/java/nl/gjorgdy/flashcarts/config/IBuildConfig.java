@@ -15,6 +15,13 @@ public interface IBuildConfig {
     int getRailSelectionBuildingMaxDistance();
 
     /**
+     * Get the frequency at which powered rails should be placed when using the rail selection building feature.
+     * For example, if this is 3, a powered rail will be placed every 3 blocks.
+     * @return the frequency at which powered rails should be placed when using the rail selection building feature.
+     */
+    int getPoweredRailFrequency();
+
+    /**
      * Whether to enable the rail extend building feature, which allows players to extend rails by right-clicking on the end of a rail with a rail in their hand.
      * If selection building is also enabled, this will only work if the player is sneaking.
      * @return whether to enable the rail extend building feature.

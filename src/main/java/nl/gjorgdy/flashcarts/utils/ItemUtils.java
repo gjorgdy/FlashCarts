@@ -10,6 +10,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.phys.BlockHitResult;
@@ -35,6 +36,14 @@ public abstract class ItemUtils {
             }
             return placed;
         } else return false;
+    }
+
+    public static boolean place(Item item, Player player, BlockPos pos, SoundEvent soundEvent) {
+        var index = player.getInventory().findSlotMatchingItem(item.getDefaultInstance());
+        if (index == -1) return false;
+        var stack = player.getInventory().getItem(index);
+        if (stack.isEmpty()) return false;
+        return place(stack, player, pos, soundEvent);
     }
 
 }

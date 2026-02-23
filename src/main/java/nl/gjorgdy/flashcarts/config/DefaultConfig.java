@@ -20,6 +20,9 @@ public class DefaultConfig implements IConfig {
 		}
 
 		@Override
+		public int getPoweredRailFrequency() {return default_poweredRailFrequency;}
+
+		@Override
 		public boolean isRailExtendBuildingEnabled() {
 			return default_railExtendBuildingEnabled;
 		}
