@@ -1,0 +1,39 @@
+package nl.gjorgdy.flashcarts.listeners;
+
+import net.fabricmc.fabric.api.event.player.UseItemCallback;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
+import nl.gjorgdy.flashcarts.interfaces.ISelectionHolder;
+import nl.gjorgdy.flashcarts.utils.PlayerUtils;
+import org.jspecify.annotations.NonNull;
+
+public class UseItemCallbackListener implements UseItemCallback {
+
+    @Override
+    public @NonNull InteractionResult interact(@NonNull Player player, @NonNull Level world, @NonNull InteractionHand hand) {
+        if (player instanceof ISelectionHolder selectionHolder) {
+            if (selectionHolder.flashCarts$getStartPointPos() != null) {
+                clear(player, selectionHolder);
+                player.swing(hand, true);
+                return InteractionResult.SUCCESS;
+            }
+        }
+        return InteractionResult.PASS;
+    }
+
+    private static void clear(Player player, ISelectionHolder selectionHolder) {
+        selectionHolder.flashCarts$clearStartPoint();
+        if (player instanceof ServerPlayer splayer) {
+            splayer.displayClientMessage(Component.literal("§6Cleared selection"), true);
+            PlayerUtils.playDirectSound(splayer, SoundEvents.UI_BUTTON_CLICK.value(), SoundSource.BLOCKS);
+            splayer.swing(InteractionHand.MAIN_HAND);
+        }
+    }
+
+}

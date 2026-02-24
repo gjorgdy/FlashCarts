@@ -29,11 +29,11 @@ public class UseBlockCallbackListener implements UseBlockCallback {
             // rail selection
             if (Flashcarts.config.getBuildConfig().isRailSelectionBuildingEnabled() && !player.isCrouching()) {
                 if (player instanceof ISelectionHolder selectionHolder) {
-                    selectionHolder.flashCarts$setStartPoint(blockHitResult.getBlockPos(), level);
-                    if (player instanceof ServerPlayer splayer) {
-                        splayer.displayClientMessage(Component.literal("§aStart point set, place a rail to build"), true);
-                        PlayerUtils.playDirectSound(splayer, SoundEvents.UI_BUTTON_CLICK.value(), SoundSource.BLOCKS);
-                        splayer.swing(interactionHand);
+                    var cachedPos = selectionHolder.flashCarts$getStartPointPos();
+                    if (cachedPos == null || !cachedPos.equals(blockHitResult.getBlockPos())) {
+                        select(player, blockHitResult.getBlockPos(), level);
+                    } else {
+                        clear(player);
                     }
                 }
             // rail extension
@@ -49,16 +49,15 @@ public class UseBlockCallbackListener implements UseBlockCallback {
         } else {
             // rail selection
             if (!Flashcarts.config.getBuildConfig().isRailSelectionBuildingEnabled()) return InteractionResult.PASS;
-            if (player instanceof ServerPlayer serverPlayer && player instanceof ISelectionHolder selectionHolder && selectionHolder.flashCarts$isStartPointSet()) {
+            if (player instanceof ISelectionHolder selectionHolder && selectionHolder.flashCarts$isStartPointSet()) {
                 if (player.isCrouching()) {
-                    serverPlayer.displayClientMessage(Component.literal("§6Cleared selection"), true);
-                    PlayerUtils.playDirectSound(serverPlayer, SoundEvents.UI_BUTTON_CLICK.value(), SoundSource.BLOCKS);
-                    serverPlayer.swing(interactionHand);
-                    selectionHolder.flashCarts$clearStartPoint();
-                    return InteractionResult.PASS;
+                    clear(player);
+                    player.swing(interactionHand, true);
+                    return InteractionResult.SUCCESS;
                 }
                 if (selectionHolder.flashCarts$getStartPointLevel() != level) {
                     player.displayClientMessage(Component.literal("§cNo valid rail path found!"), true);
+                    player.swing(interactionHand, true);
                     return InteractionResult.FAIL;
                 }
                 var startPos = selectionHolder.flashCarts$getStartPointPos();
@@ -68,6 +67,7 @@ public class UseBlockCallbackListener implements UseBlockCallback {
 
                 if (path.isEmpty() || !path.getLast().equals(endPos)) {
                     player.displayClientMessage(Component.literal("§cNo valid rail path found!"), true);
+                    player.swing(interactionHand, true);
                     return InteractionResult.FAIL;
                 } else {
                     int i = 1;
@@ -89,6 +89,28 @@ public class UseBlockCallbackListener implements UseBlockCallback {
             }
         }
         return InteractionResult.PASS;
+    }
+
+    private static void select(Player player, BlockPos blockPos, Level level) {
+        if (player instanceof ISelectionHolder selectionHolder) {
+            selectionHolder.flashCarts$setStartPoint(blockPos, level);
+            if (player instanceof ServerPlayer splayer) {
+                splayer.displayClientMessage(Component.literal("§aStart point set, place a rail to build"), true);
+                PlayerUtils.playDirectSound(splayer, SoundEvents.UI_BUTTON_CLICK.value(), SoundSource.BLOCKS);
+                splayer.swing(InteractionHand.MAIN_HAND);
+            }
+        }
+    }
+
+    private static void clear(Player player) {
+        if (player instanceof ISelectionHolder selectionHolder) {
+            selectionHolder.flashCarts$clearStartPoint();
+            if (player instanceof ServerPlayer splayer) {
+                splayer.displayClientMessage(Component.literal("§6Cleared selection"), true);
+                PlayerUtils.playDirectSound(splayer, SoundEvents.UI_BUTTON_CLICK.value(), SoundSource.BLOCKS);
+                splayer.swing(InteractionHand.MAIN_HAND);
+            }
+        }
     }
 
 }

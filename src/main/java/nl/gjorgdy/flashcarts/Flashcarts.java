@@ -1,23 +1,18 @@
 package nl.gjorgdy.flashcarts;
 
-import com.mojang.serialization.MapCodec;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
-import net.fabricmc.fabric.api.resource.conditions.v1.ResourceCondition;
-import net.fabricmc.fabric.api.resource.conditions.v1.ResourceConditionType;
+import net.fabricmc.fabric.api.event.player.UseItemCallback;
 import net.fabricmc.fabric.api.resource.conditions.v1.ResourceConditions;
-import net.fabricmc.fabric.api.resource.v1.ResourceLoader;
-import net.fabricmc.fabric.impl.resource.ResourceLoaderImpl;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.resources.Identifier;
-import net.minecraft.server.MinecraftServer;
 import nl.gjorgdy.flashcarts.config.ConfigResourceCondition;
 import nl.gjorgdy.flashcarts.config.DefaultConfig;
 import nl.gjorgdy.flashcarts.config.FzzyConfig;
 import nl.gjorgdy.flashcarts.config.IConfig;
 import nl.gjorgdy.flashcarts.listeners.ReloadCallbackListener;
 import nl.gjorgdy.flashcarts.listeners.UseBlockCallbackListener;
+import nl.gjorgdy.flashcarts.listeners.UseItemCallbackListener;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -35,6 +30,7 @@ public class Flashcarts implements ModInitializer {
 	@Override
 	public void onInitialize() {
 		UseBlockCallback.EVENT.register(new UseBlockCallbackListener());
+		UseItemCallback.EVENT.register(new UseItemCallbackListener());
 		ServerLifecycleEvents.START_DATA_PACK_RELOAD.register(new ReloadCallbackListener());
 		ResourceConditions.register(new ConfigResourceCondition().getType());
 
