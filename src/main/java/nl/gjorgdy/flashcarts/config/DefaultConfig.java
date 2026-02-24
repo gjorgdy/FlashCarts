@@ -23,8 +23,8 @@ public class DefaultConfig implements IConfig {
 		public int getPoweredRailFrequency() {return default_poweredRailFrequency;}
 
 		@Override
-		public boolean shouldShowSelectionParticles() {
-			return default_showSelectionParticles;
+		public boolean shouldShowSelection() {
+			return default_showSelection;
 		}
 
 		@Override

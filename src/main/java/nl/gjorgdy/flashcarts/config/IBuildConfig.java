@@ -22,10 +22,10 @@ public interface IBuildConfig {
     int getPoweredRailFrequency();
 
     /**
-     * Whether to show selection particles when using the rail selection building feature.
-     * @return whether to show selection particles when using the rail selection building feature.
+     * Whether to show selection when using the rail selection building feature.
+     * @return whether to show selection when using the rail selection building feature.
      */
-    boolean shouldShowSelectionParticles();
+    boolean shouldShowSelection();
 
     /**
      * Whether to enable the rail extend building feature, which allows players to extend rails by right-clicking on the end of a rail with a rail in their hand.

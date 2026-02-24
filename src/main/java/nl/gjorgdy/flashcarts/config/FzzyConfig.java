@@ -163,8 +163,8 @@ public class FzzyConfig extends Config implements IConfig {
 		@Comment("How often a powered rail should be placed, set to 0 to disable, default: " + default_poweredRailFrequency)
 		private ValidatedInt poweredRailFrequency = new ValidatedInt(default_poweredRailFrequency, 32, 0, ValidatedNumber.WidgetType.TEXTBOX);
 
-		@Comment("Whether to show selection particles when using the rail selection building feature, default: " + default_showSelectionParticles)
-		private boolean showSelectionParticles = default_showSelectionParticles;
+		@Comment("Whether to show the selection when using the rail selection building feature, default: " + default_showSelection)
+		private boolean showSelection = default_showSelection;
 
 		@Comment("Whether to enable rail extending building, default: " + default_railExtendBuildingEnabled)
 		private boolean railExtendBuilding = default_railExtendBuildingEnabled;
@@ -188,8 +188,8 @@ public class FzzyConfig extends Config implements IConfig {
 		}
 
 		@Override
-		public boolean shouldShowSelectionParticles() {
-			return showSelectionParticles;
+		public boolean shouldShowSelection() {
+			return showSelection;
 		}
 
 		@Override

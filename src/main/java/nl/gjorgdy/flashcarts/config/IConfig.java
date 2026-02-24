@@ -17,7 +17,7 @@ public interface IConfig {
 	boolean default_railSelectionBuildingEnabled = true;
 	int default_railSelectionBuildingMaxDistance = 64;
 	int default_poweredRailFrequency = 8;
-	boolean default_showSelectionParticles = true;
+	boolean default_showSelection = true;
 	boolean default_railExtendBuildingEnabled = true;
 	int default_railExtendBuildingMaxDistance = 16;
 
