@@ -5,6 +5,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -15,6 +16,7 @@ import net.minecraft.world.phys.BlockHitResult;
 import nl.gjorgdy.flashcarts.Flashcarts;
 import nl.gjorgdy.flashcarts.interfaces.ISelectionHolder;
 import nl.gjorgdy.flashcarts.utils.ItemUtils;
+import nl.gjorgdy.flashcarts.utils.PlayerUtils;
 import nl.gjorgdy.flashcarts.utils.RailUtils;
 import org.jspecify.annotations.NonNull;
 
@@ -28,7 +30,11 @@ public class UseBlockCallbackListener implements UseBlockCallback {
             if (Flashcarts.config.getBuildConfig().isRailSelectionBuildingEnabled() && !player.isCrouching()) {
                 if (player instanceof ISelectionHolder selectionHolder) {
                     selectionHolder.flashCarts$setStartPoint(blockHitResult.getBlockPos(), level);
-                    player.displayClientMessage(Component.literal("Start point set! Now select the end point."), true);
+                    if (player instanceof ServerPlayer splayer) {
+                        splayer.displayClientMessage(Component.literal("§aStart point set, place a rail to build"), true);
+                        PlayerUtils.playDirectSound(splayer, SoundEvents.UI_BUTTON_CLICK.value(), SoundSource.BLOCKS);
+                        splayer.swing(interactionHand);
+                    }
                 }
             // rail extension
             } else if (Flashcarts.config.getBuildConfig().isRailExtendBuildingEnabled()) {
@@ -45,12 +51,16 @@ public class UseBlockCallbackListener implements UseBlockCallback {
             if (!Flashcarts.config.getBuildConfig().isRailSelectionBuildingEnabled()) return InteractionResult.PASS;
             if (player instanceof ServerPlayer serverPlayer && player instanceof ISelectionHolder selectionHolder && selectionHolder.flashCarts$isStartPointSet()) {
                 if (player.isCrouching()) {
-                    player.displayClientMessage(Component.literal("§aCleared selection"), true);
+                    if (player instanceof ServerPlayer splayer) {
+                        player.displayClientMessage(Component.literal("§6Cleared selection"), true);
+                        PlayerUtils.playDirectSound(splayer, SoundEvents.UI_BUTTON_CLICK.value(), SoundSource.BLOCKS);
+                        splayer.swing(interactionHand);
+                    }
                     selectionHolder.flashCarts$clearStartPoint();
                     return InteractionResult.PASS;
                 }
                 if (selectionHolder.flashCarts$getStartPointLevel() != level) {
-                    player.displayClientMessage(Component.literal("§cStart point is in a different world!"), true);
+                    player.displayClientMessage(Component.literal("§cNo valid rail path found!"), true);
                     return InteractionResult.FAIL;
                 }
                 var startPos = selectionHolder.flashCarts$getStartPointPos();
@@ -71,7 +81,10 @@ public class UseBlockCallbackListener implements UseBlockCallback {
                     }
                 }
 
-                player.displayClientMessage(Component.literal("§aStart point found; " + selectionHolder.flashCarts$getStartPointPos()), true);
+                if (player instanceof ServerPlayer splayer) {
+                    PlayerUtils.playDirectSound(splayer, SoundEvents.UI_BUTTON_CLICK.value(), SoundSource.BLOCKS);
+                    splayer.swing(interactionHand);
+                }
                 selectionHolder.flashCarts$clearStartPoint();
                 return InteractionResult.SUCCESS;
             }
