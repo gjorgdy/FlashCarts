@@ -39,6 +39,7 @@ public abstract class ItemUtils {
     }
 
     public static boolean place(Item item, Player player, BlockPos pos, SoundEvent soundEvent) {
+        if (player.isCreative()) return place(new ItemStack(item), player, pos, soundEvent);
         var index = player.getInventory().findSlotMatchingItem(item.getDefaultInstance());
         if (index == -1) return false;
         var stack = player.getInventory().getItem(index);
