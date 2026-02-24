@@ -51,11 +51,9 @@ public class UseBlockCallbackListener implements UseBlockCallback {
             if (!Flashcarts.config.getBuildConfig().isRailSelectionBuildingEnabled()) return InteractionResult.PASS;
             if (player instanceof ServerPlayer serverPlayer && player instanceof ISelectionHolder selectionHolder && selectionHolder.flashCarts$isStartPointSet()) {
                 if (player.isCrouching()) {
-                    if (player instanceof ServerPlayer splayer) {
-                        player.displayClientMessage(Component.literal("§6Cleared selection"), true);
-                        PlayerUtils.playDirectSound(splayer, SoundEvents.UI_BUTTON_CLICK.value(), SoundSource.BLOCKS);
-                        splayer.swing(interactionHand);
-                    }
+                    serverPlayer.displayClientMessage(Component.literal("§6Cleared selection"), true);
+                    PlayerUtils.playDirectSound(serverPlayer, SoundEvents.UI_BUTTON_CLICK.value(), SoundSource.BLOCKS);
+                    serverPlayer.swing(interactionHand);
                     selectionHolder.flashCarts$clearStartPoint();
                     return InteractionResult.PASS;
                 }
@@ -65,9 +63,10 @@ public class UseBlockCallbackListener implements UseBlockCallback {
                 }
                 var startPos = selectionHolder.flashCarts$getStartPointPos();
                 assert startPos != null;
-                var path = RailUtils.getRailPath(level, startPos, blockHitResult.getBlockPos().above());
+                var endPos = blockHitResult.getBlockPos().relative(blockHitResult.getDirection());
+                var path = RailUtils.getRailPath(level, startPos, endPos);
 
-                if (path == null) {
+                if (path.isEmpty() || !path.getLast().equals(endPos)) {
                     player.displayClientMessage(Component.literal("§cNo valid rail path found!"), true);
                     return InteractionResult.FAIL;
                 } else {

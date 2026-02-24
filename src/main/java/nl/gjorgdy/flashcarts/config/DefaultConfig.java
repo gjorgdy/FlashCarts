@@ -23,6 +23,11 @@ public class DefaultConfig implements IConfig {
 		public int getPoweredRailFrequency() {return default_poweredRailFrequency;}
 
 		@Override
+		public boolean shouldShowSelectionParticles() {
+			return default_showSelectionParticles;
+		}
+
+		@Override
 		public boolean isRailExtendBuildingEnabled() {
 			return default_railExtendBuildingEnabled;
 		}
