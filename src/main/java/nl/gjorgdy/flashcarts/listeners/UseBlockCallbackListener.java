@@ -65,16 +65,18 @@ public class UseBlockCallbackListener implements UseBlockCallback {
                 var endPos = blockHitResult.getBlockPos().relative(blockHitResult.getDirection());
                 var path = RailUtils.getRailPath(level, startPos, endPos);
 
-                if (path.isEmpty() || !path.getLast().equals(endPos)) {
+                if (!path.isValid()) {
                     player.displayClientMessage(Component.literal("§cNo valid rail path found!"), true);
                     player.swing(interactionHand, true);
                     return InteractionResult.FAIL;
                 } else {
                     int i = 1;
                     int prf = Flashcarts.config.getBuildConfig().getPoweredRailFrequency();
-                    for (BlockPos blockPos : path) {
+                    var pos = startPos;
+                    for (var vec : path.path()) {
+                        pos = pos.offset(vec);
                         var rail = (prf != 0 && i % prf == 0) ? Items.POWERED_RAIL : Items.RAIL;
-                        boolean placed = ItemUtils.place(rail, player, blockPos, SoundEvents.METAL_PLACE);
+                        boolean placed = ItemUtils.place(rail, player, pos, SoundEvents.METAL_PLACE);
                         if (!placed) break;
                         i++;
                     }

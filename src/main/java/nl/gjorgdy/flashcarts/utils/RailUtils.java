@@ -13,6 +13,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.RailShape;
 import nl.gjorgdy.flashcarts.Flashcarts;
 import nl.gjorgdy.flashcarts.mixins.BaseRailBlockInvoker;
+import nl.gjorgdy.flashcarts.objects.RailPath;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -57,10 +58,10 @@ public abstract class RailUtils {
         return forward(world, player, vec, railItem, pos, xAxisRails, depth - 1, movedVertically);
     }
 
-    public static List<BlockPos> getRailPath(Level level, BlockPos startPos, BlockPos endPos) {
+    public static RailPath getRailPath(Level level, BlockPos startPos, BlockPos endPos) {
         var dist = startPos.distChessboard(endPos);
         int maxDist = Flashcarts.config.getBuildConfig().getRailSelectionBuildingMaxDistance();
-        if (startPos.equals(endPos)) return new LinkedList<>();
+        if (startPos.equals(endPos)) return new RailPath(startPos, endPos, List.of(), false);
 
         Vec3i step;
         if (startPos.getX() != endPos.getX()) {
@@ -68,26 +69,67 @@ public abstract class RailUtils {
         } else {
             step = new Vec3i(0, 0, Integer.signum(endPos.getZ() - startPos.getZ()));
         }
-        var path = new LinkedList<BlockPos>();
+        var path = new LinkedList<Vec3i>();
         var currentPos = new BlockPos(startPos);
+        var _step = new Vec3i(step.getX(), step.getY(), step.getZ());
         while (!currentPos.equals(endPos)) {
             currentPos = currentPos.offset(step);
+            maxDist--;
             var currentDist = startPos.distChessboard(currentPos);
-            if (currentDist > dist || currentDist > maxDist) return path;
+            if (currentDist > dist || currentDist > maxDist) return new RailPath(startPos, endPos, path, false);
+
+            if (isRail(level, currentPos)) {
+                _step = _step.offset(step);
+                continue;
+            }
             if (!canBePlaced(level, currentPos)) {
                 if (canBePlaced(level, currentPos.above())) {
                     currentPos = currentPos.above();
+                    path.add(_step.above());
+                } else if (isRail(level, currentPos.above())) {
+                    currentPos = currentPos.above();
+                    _step = _step.offset(step).above();
+                    continue;
                 } else if (canBePlaced(level, currentPos.below())) {
                     currentPos = currentPos.below();
-                } else return path;
+                    path.add(_step.below());
+                } else if (isRail(level, currentPos.below())) {
+                    currentPos = currentPos.below();
+                    _step = _step.offset(step).below();
+                    continue;
+                } else return new RailPath(startPos, endPos, path, false);
+            } else {
+                path.add(_step);
             }
-            path.add(currentPos);
-
-            maxDist--;
-            if (maxDist < 0) return path;
+            if (maxDist < 0) return new RailPath(startPos, endPos, path, false);
+            _step = new Vec3i(step.getX(), step.getY(), step.getZ());
         }
 
-        return path;
+        return new RailPath(startPos, endPos, path, true);
+    }
+
+    public static RailShape getRailShape(Vec3i vec) {
+        if (vec.getY() == 0 || (vec.getX() != vec.getY() && vec.getZ() != vec.getY())) {
+            if (vec.getX() != 0) {
+                return RailShape.EAST_WEST;
+            } else {
+                return RailShape.NORTH_SOUTH;
+            }
+        } else {
+            if ((vec.getY() > 0 && vec.getX() > 0) || (vec.getY() < 0 && vec.getX() < 0)) {
+                return RailShape.ASCENDING_EAST;
+            } else if ((vec.getY() > 0 && vec.getX() < 0) || (vec.getY() < 0 && vec.getX() > 0)) {
+                return RailShape.ASCENDING_WEST;
+            } else if ((vec.getY() > 0 && vec.getZ() > 0) || (vec.getY() < 0 && vec.getZ() < 0)) {
+                return RailShape.ASCENDING_SOUTH;
+            } else {
+                return RailShape.ASCENDING_NORTH;
+            }
+        }
+    }
+
+    private static boolean isRail(Level level, BlockPos pos) {
+        return level.getBlockState(pos).getBlock() instanceof BaseRailBlock;
     }
 
     private static boolean canBePlaced(Level level, BlockPos pos) {

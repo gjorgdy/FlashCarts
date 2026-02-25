@@ -16,6 +16,7 @@ import net.minecraft.world.phys.Vec3;
 import nl.gjorgdy.flashcarts.Flashcarts;
 import nl.gjorgdy.flashcarts.handlers.BlockDisplayEntityHandler;
 import nl.gjorgdy.flashcarts.interfaces.ISelectionHolder;
+import nl.gjorgdy.flashcarts.objects.RailPath;
 import nl.gjorgdy.flashcarts.utils.ItemUtils;
 import nl.gjorgdy.flashcarts.utils.RailUtils;
 import org.jspecify.annotations.NonNull;
@@ -35,8 +36,6 @@ public abstract class ServerPlayerMixin extends Player implements ISelectionHold
     @Shadow
     public abstract @NonNull Level level();
 
-    @Shadow
-    public ServerGamePacketListenerImpl connection;
     @Unique
     @Nullable
     private BlockPos startPointPos;
@@ -51,7 +50,7 @@ public abstract class ServerPlayerMixin extends Player implements ISelectionHold
 
     @Unique
     @Nullable
-    private List<BlockPos> currentPath;
+    private RailPath currentPath;
 
     @Unique
     @Nullable
@@ -130,15 +129,11 @@ public abstract class ServerPlayerMixin extends Player implements ISelectionHold
         assert blockDisplayEntityHandler != null;
         blockDisplayEntityHandler.reset();
 
-        boolean pathValid = currentPath != null && !currentPath.isEmpty() && currentPath.getLast().equals(lookingAtPos);
-
         var delta = startPos.subtract(endPos);
         boolean zAxis = Math.abs(delta.getZ()) > Math.abs(delta.getX());
 
-        var poweredRail = Blocks.POWERED_RAIL.defaultBlockState()
-            .setValue(PoweredRailBlock.SHAPE, zAxis ? RailShape.NORTH_SOUTH : RailShape.EAST_WEST);
-        var rail = Blocks.RAIL.defaultBlockState()
-            .setValue(RailBlock.SHAPE, zAxis ? RailShape.NORTH_SOUTH : RailShape.EAST_WEST);
+        var poweredRail = Blocks.POWERED_RAIL.defaultBlockState();
+        var rail = Blocks.RAIL.defaultBlockState();
 
         if (blockDisplayEntityHandler != null) {
             blockDisplayEntityHandler.add(
@@ -150,13 +145,17 @@ public abstract class ServerPlayerMixin extends Player implements ISelectionHold
 
         int i = 1;
         int prf = Flashcarts.config.getBuildConfig().getPoweredRailFrequency();
-        for (var pos : currentPath) {
-            var railBlockState = (prf != 0 && i % prf == 0) ? poweredRail : rail;
+        var pos = startPos;
+        for (var vec : currentPath.path()) {
+            pos = pos.offset(vec);
+            var railBlockState = (prf != 0 && i % prf == 0)
+                    ? poweredRail.setValue(PoweredRailBlock.SHAPE, RailUtils.getRailShape(vec))
+                    : rail.setValue(RailBlock.SHAPE, RailUtils.getRailShape(vec));
             if (blockDisplayEntityHandler != null) {
                 blockDisplayEntityHandler.add(
                     railBlockState,
                     pos,
-                    pathValid ? 0xFFFFFF : 0xFF0000
+                    currentPath.isValid() ? 0xFFFFFF : 0xFF0000
                 );
             }
             i++;
