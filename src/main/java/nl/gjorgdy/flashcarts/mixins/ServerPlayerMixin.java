@@ -114,7 +114,7 @@ public abstract class ServerPlayerMixin extends Player implements ISelectionHold
             return;
         }
 
-        BlockHitResult blockHit = PlayerUtils.rayCast(this, 3.5);
+        BlockHitResult blockHit = PlayerUtils.rayCast(this, 4);
         var targetBlockState = level().getBlockState(blockHit.getBlockPos());
         var endPos = targetBlockState.canBeReplaced()
                 ? blockHit.getBlockPos()
@@ -139,12 +139,13 @@ public abstract class ServerPlayerMixin extends Player implements ISelectionHold
             );
         }
 
-        AtomicInteger i = new AtomicInteger(1);
+        AtomicInteger i = new AtomicInteger(0);
         AtomicReference<BlockPos> pos = new AtomicReference<>(startPos);
         int prf = Flashcarts.config.getBuildConfig().getPoweredRailFrequency();
 
         ListUtils.biIterate(currentPath.path(), (vec, nextVec) -> {
             pos.set(pos.get().offset(vec));
+            i.getAndAdd(vec.getX() + vec.getZ());
             var shape = RailUtils.getRailShape(vec, nextVec);
             var railBlockState = (prf != 0 && i.get() % prf == 0)
                     ? Blocks.POWERED_RAIL.defaultBlockState().setValue(PoweredRailBlock.SHAPE, shape)
@@ -156,7 +157,6 @@ public abstract class ServerPlayerMixin extends Player implements ISelectionHold
                     currentPath.isValid() ? 0xFFFFFF : 0xFF0000
                 );
             }
-            i.getAndIncrement();
         });
     }
 

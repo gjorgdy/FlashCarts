@@ -72,15 +72,15 @@ public class UseBlockCallbackListener implements UseBlockCallback {
                     player.swing(interactionHand, true);
                     return InteractionResult.FAIL;
                 } else {
-                    int i = 1;
+                    int i = 0;
                     int prf = Flashcarts.config.getBuildConfig().getPoweredRailFrequency();
                     var pos = startPos;
                     for (var vec : path.path()) {
                         pos = pos.offset(vec);
+                        i += vec.getX() + vec.getZ();
                         var rail = (prf != 0 && i % prf == 0) ? Items.POWERED_RAIL : Items.RAIL;
                         boolean placed = ItemUtils.place(rail, player, pos, SoundEvents.METAL_PLACE);
                         if (!placed) break;
-                        i++;
                     }
                 }
 
