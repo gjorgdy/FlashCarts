@@ -122,7 +122,7 @@ public abstract class ServerPlayerMixin extends Player implements ISelectionHold
                 ? blockHit.getBlockPos()
                 : blockHit.getBlockPos().relative(blockHit.getDirection());
 
-        if (currentPath != null && (endPos.equals(lookingAtPos) || (targetBlockState.isAir() && !currentPath.isValid()))) return;
+        if (currentPath != null && (endPos.equals(lookingAtPos) || (targetBlockState.isAir() && !currentPath.isValid() || !startPos.equals(currentPath.start())))) return;
 
         lookingAtPos = endPos;
         currentPath = RailUtils.getRailPath(level(), startPos, lookingAtPos);
