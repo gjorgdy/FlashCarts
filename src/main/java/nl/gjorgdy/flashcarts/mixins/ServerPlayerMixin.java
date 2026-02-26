@@ -2,15 +2,14 @@ package nl.gjorgdy.flashcarts.mixins;
 
 import com.mojang.authlib.GameProfile;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Vec3i;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.PoweredRailBlock;
 import net.minecraft.world.level.block.RailBlock;
-import net.minecraft.world.level.block.state.properties.RailShape;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import nl.gjorgdy.flashcarts.Flashcarts;
@@ -18,6 +17,8 @@ import nl.gjorgdy.flashcarts.handlers.BlockDisplayEntityHandler;
 import nl.gjorgdy.flashcarts.interfaces.ISelectionHolder;
 import nl.gjorgdy.flashcarts.objects.RailPath;
 import nl.gjorgdy.flashcarts.utils.ItemUtils;
+import nl.gjorgdy.flashcarts.utils.ListUtils;
+import nl.gjorgdy.flashcarts.utils.PlayerUtils;
 import nl.gjorgdy.flashcarts.utils.RailUtils;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -29,6 +30,9 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.BiConsumer;
 
 @Mixin(ServerPlayer.class)
 public abstract class ServerPlayerMixin extends Player implements ISelectionHolder {
@@ -90,7 +94,7 @@ public abstract class ServerPlayerMixin extends Player implements ISelectionHold
     @Inject(method = "tick", at = @At("TAIL"))
     public void onTick(CallbackInfo ci) {
         if (level().isClientSide()
-                || tickCount % 5 != 0
+                || tickCount % 2 != 0
                 || !Flashcarts.config.getBuildConfig().shouldShowSelection()
         ) return;
 
@@ -103,18 +107,7 @@ public abstract class ServerPlayerMixin extends Player implements ISelectionHold
             return;
         }
 
-        Vec3 start = getEyePosition(1.0F);
-        Vec3 lookVec = getViewVector(1.0F);
-        Vec3 end = start.add(lookVec.multiply(8, 8, 8));
-        ClipContext context = new ClipContext(
-                start,
-                end,
-                ClipContext.Block.OUTLINE,
-                ClipContext.Fluid.NONE,
-                this
-        );
-
-        BlockHitResult blockHit = level().clip(context);
+        BlockHitResult blockHit = PlayerUtils.rayCast(this, 8);
         var startPos = flashCarts$getStartPointPos();
         assert startPos != null;
 
@@ -129,12 +122,6 @@ public abstract class ServerPlayerMixin extends Player implements ISelectionHold
         assert blockDisplayEntityHandler != null;
         blockDisplayEntityHandler.reset();
 
-        var delta = startPos.subtract(endPos);
-        boolean zAxis = Math.abs(delta.getZ()) > Math.abs(delta.getX());
-
-        var poweredRail = Blocks.POWERED_RAIL.defaultBlockState();
-        var rail = Blocks.RAIL.defaultBlockState();
-
         if (blockDisplayEntityHandler != null) {
             blockDisplayEntityHandler.add(
                 level().getBlockState(startPos),
@@ -143,23 +130,25 @@ public abstract class ServerPlayerMixin extends Player implements ISelectionHold
             );
         }
 
-        int i = 1;
+        AtomicInteger i = new AtomicInteger(1);
+        AtomicReference<BlockPos> pos = new AtomicReference<>(startPos);
         int prf = Flashcarts.config.getBuildConfig().getPoweredRailFrequency();
-        var pos = startPos;
-        for (var vec : currentPath.path()) {
-            pos = pos.offset(vec);
-            var railBlockState = (prf != 0 && i % prf == 0)
-                    ? poweredRail.setValue(PoweredRailBlock.SHAPE, RailUtils.getRailShape(vec))
-                    : rail.setValue(RailBlock.SHAPE, RailUtils.getRailShape(vec));
+
+        ListUtils.biIterate(currentPath.path(), (vec, nextVec) -> {
+            pos.set(pos.get().offset(vec));
+            var shape = RailUtils.getRailShape(vec, nextVec);
+            var railBlockState = (prf != 0 && i.get() % prf == 0)
+                    ? Blocks.POWERED_RAIL.defaultBlockState().setValue(PoweredRailBlock.SHAPE, shape)
+                    : Blocks.RAIL.defaultBlockState().setValue(RailBlock.SHAPE, shape);
             if (blockDisplayEntityHandler != null) {
                 blockDisplayEntityHandler.add(
                     railBlockState,
-                    pos,
+                    pos.get(),
                     currentPath.isValid() ? 0xFFFFFF : 0xFF0000
                 );
             }
-            i++;
-        }
+            i.getAndIncrement();
+        });
     }
 
 }

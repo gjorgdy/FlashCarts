@@ -14,6 +14,7 @@ import net.minecraft.world.level.block.state.properties.RailShape;
 import nl.gjorgdy.flashcarts.Flashcarts;
 import nl.gjorgdy.flashcarts.mixins.BaseRailBlockInvoker;
 import nl.gjorgdy.flashcarts.objects.RailPath;
+import org.jspecify.annotations.Nullable;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -109,19 +110,19 @@ public abstract class RailUtils {
         return new RailPath(startPos, endPos, path, true);
     }
 
-    public static RailShape getRailShape(Vec3i vec) {
-        if (vec.getY() == 0 || (vec.getX() != vec.getY() && vec.getZ() != vec.getY())) {
+    public static RailShape getRailShape(Vec3i vec, @Nullable Vec3i nextVec) {
+        if (nextVec == null || vec.getY() >= 0 && nextVec.getY() <= 0 || (vec.getX() != vec.getY() && vec.getZ() != vec.getY())) {
             if (vec.getX() != 0) {
                 return RailShape.EAST_WEST;
             } else {
                 return RailShape.NORTH_SOUTH;
             }
         } else {
-            if ((vec.getY() > 0 && vec.getX() > 0) || (vec.getY() < 0 && vec.getX() < 0)) {
+            if ((nextVec.getY() > 0 && vec.getX() > 0) || (vec.getY() < 0 && vec.getX() < 0)) {
                 return RailShape.ASCENDING_EAST;
-            } else if ((vec.getY() > 0 && vec.getX() < 0) || (vec.getY() < 0 && vec.getX() > 0)) {
+            } else if ((nextVec.getY() > 0 && vec.getX() < 0) || (vec.getY() < 0 && vec.getX() > 0)) {
                 return RailShape.ASCENDING_WEST;
-            } else if ((vec.getY() > 0 && vec.getZ() > 0) || (vec.getY() < 0 && vec.getZ() < 0)) {
+            } else if ((nextVec.getY() > 0 && vec.getZ() > 0) || (vec.getY() < 0 && vec.getZ() < 0)) {
                 return RailShape.ASCENDING_SOUTH;
             } else {
                 return RailShape.ASCENDING_NORTH;
