@@ -64,7 +64,8 @@ public abstract class RailUtils {
         if (startPos.equals(endPos)) return new RailPath(startPos, endPos, List.of(), false);
 
         Vec3i step;
-        if (startPos.getX() != endPos.getX()) {
+        var delta = endPos.subtract(startPos);
+        if (Math.abs(delta.getX()) >= Math.abs(delta.getZ())) {
             step = new Vec3i(Integer.signum(endPos.getX() - startPos.getX()), 0, 0);
         } else {
             step = new Vec3i(0, 0, Integer.signum(endPos.getZ() - startPos.getZ()));
