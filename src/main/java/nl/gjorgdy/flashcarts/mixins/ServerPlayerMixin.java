@@ -7,6 +7,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.BaseRailBlock;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.PoweredRailBlock;
 import net.minecraft.world.level.block.RailBlock;
@@ -108,6 +109,12 @@ public abstract class ServerPlayerMixin extends Player implements ISelectionHold
         BlockHitResult blockHit = PlayerUtils.rayCast(this, 5);
         var startPos = flashCarts$getStartPointPos();
         assert startPos != null;
+
+        if (!(level().getBlockState(startPos).getBlock() instanceof BaseRailBlock)) {
+            blockDisplayEntityHandler.reset();
+            flashCarts$clearStartPoint();
+            return;
+        }
 
         var target = blockHit.getBlockPos();
         var endPos = blockHit.getBlockPos().relative(blockHit.getDirection());
