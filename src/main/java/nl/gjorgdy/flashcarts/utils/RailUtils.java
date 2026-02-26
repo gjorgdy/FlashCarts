@@ -111,18 +111,18 @@ public abstract class RailUtils {
     }
 
     public static RailShape getRailShape(Vec3i vec, @Nullable Vec3i nextVec) {
-        if (nextVec == null || vec.getY() >= 0 && nextVec.getY() <= 0 || (vec.getX() != vec.getY() && vec.getZ() != vec.getY())) {
+        if (vec.getY() >= 0 && (nextVec == null || nextVec.getY() <= 0) || (vec.getX() != vec.getY() && vec.getZ() != vec.getY())) {
             if (vec.getX() != 0) {
                 return RailShape.EAST_WEST;
             } else {
                 return RailShape.NORTH_SOUTH;
             }
         } else {
-            if ((nextVec.getY() > 0 && vec.getX() > 0) || (vec.getY() < 0 && vec.getX() < 0)) {
+            if ((nextVec != null && nextVec.getY() > 0 && vec.getX() > 0) || (vec.getY() < 0 && vec.getX() < 0)) {
                 return RailShape.ASCENDING_EAST;
-            } else if ((nextVec.getY() > 0 && vec.getX() < 0) || (vec.getY() < 0 && vec.getX() > 0)) {
+            } else if ((nextVec != null && nextVec.getY() > 0 && vec.getX() < 0) || (vec.getY() < 0 && vec.getX() > 0)) {
                 return RailShape.ASCENDING_WEST;
-            } else if ((nextVec.getY() > 0 && vec.getZ() > 0) || (vec.getY() < 0 && vec.getZ() < 0)) {
+            } else if ((nextVec != null && nextVec.getY() > 0 && vec.getZ() > 0) || (vec.getY() < 0 && vec.getZ() < 0)) {
                 return RailShape.ASCENDING_SOUTH;
             } else {
                 return RailShape.ASCENDING_NORTH;
