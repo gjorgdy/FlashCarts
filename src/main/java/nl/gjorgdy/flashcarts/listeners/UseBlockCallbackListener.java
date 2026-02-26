@@ -23,15 +23,15 @@ import org.jspecify.annotations.NonNull;
 public class UseBlockCallbackListener implements UseBlockCallback {
 
     @Override
-    public @NonNull InteractionResult interact(@NonNull Player player, @NonNull Level level, @NonNull InteractionHand interactionHand, @NonNull BlockHitResult blockHitResult) {
+    public @NonNull InteractionResult interact(@NonNull Player player, @NonNull Level level, @NonNull InteractionHand interactionHand, @NonNull BlockHitResult blockHit) {
         if (level.isClientSide() || !ItemUtils.isRails(player.getItemInHand(interactionHand)) ) return InteractionResult.PASS;
-        if (level.getBlockState(blockHitResult.getBlockPos()).getBlock() instanceof BaseRailBlock) {
+        if (level.getBlockState(blockHit.getBlockPos()).getBlock() instanceof BaseRailBlock) {
             // rail selection
             if (Flashcarts.config.getBuildConfig().isRailSelectionBuildingEnabled() && !player.isCrouching()) {
                 if (player instanceof ISelectionHolder selectionHolder) {
                     var cachedPos = selectionHolder.flashCarts$getStartPointPos();
-                    if (cachedPos == null || !cachedPos.equals(blockHitResult.getBlockPos())) {
-                        select(player, blockHitResult.getBlockPos(), level);
+                    if (cachedPos == null || !cachedPos.equals(blockHit.getBlockPos())) {
+                        select(player, blockHit.getBlockPos(), level);
                     } else {
                         clear(player);
                     }
@@ -39,7 +39,7 @@ public class UseBlockCallbackListener implements UseBlockCallback {
             // rail extension
             } else if (Flashcarts.config.getBuildConfig().isRailExtendBuildingEnabled()) {
                 var itemStack = player.getItemInHand(interactionHand);
-                var blockPos = blockHitResult.getBlockPos();
+                var blockPos = blockHit.getBlockPos();
                 var blockState = level.getBlockState(blockPos);
                 if (player instanceof ServerPlayer serverPlayer && RailUtils.place(serverPlayer, itemStack, blockState, blockPos)) {
                     player.swing(interactionHand, true);
@@ -62,7 +62,9 @@ public class UseBlockCallbackListener implements UseBlockCallback {
                 }
                 var startPos = selectionHolder.flashCarts$getStartPointPos();
                 assert startPos != null;
-                var endPos = blockHitResult.getBlockPos().relative(blockHitResult.getDirection());
+                var endPos = level.getBlockState(blockHit.getBlockPos()).canBeReplaced()
+                        ? blockHit.getBlockPos()
+                        : blockHit.getBlockPos().relative(blockHit.getDirection());
                 var path = RailUtils.getRailPath(level, startPos, endPos);
 
                 if (!path.isValid()) {

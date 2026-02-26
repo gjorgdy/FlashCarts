@@ -114,9 +114,11 @@ public abstract class ServerPlayerMixin extends Player implements ISelectionHold
             return;
         }
 
-        BlockHitResult blockHit = PlayerUtils.rayCast(this, 5);
+        BlockHitResult blockHit = PlayerUtils.rayCast(this, 3.5);
         var targetBlockState = level().getBlockState(blockHit.getBlockPos());
-        var endPos = blockHit.getBlockPos().relative(blockHit.getDirection());
+        var endPos = targetBlockState.canBeReplaced()
+                ? blockHit.getBlockPos()
+                : blockHit.getBlockPos().relative(blockHit.getDirection());
 
         if (currentPath == null || (targetBlockState.isAir() && currentPath.isValid()) || !endPos.equals(lookingAtPos)) {
             lookingAtPos = endPos;
