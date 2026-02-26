@@ -122,9 +122,9 @@ public abstract class RailUtils {
         // descending rails can be checked on the current vector
         if (vec.getY() < 0) {
             if (vec.getX() < 0 && vec.getX() == vec.getY()) return RailShape.ASCENDING_EAST;
-            if (vec.getX() > 0 && vec.getX() == vec.getY()) return RailShape.ASCENDING_WEST;
+            if (vec.getX() > 0 && -vec.getX() == vec.getY()) return RailShape.ASCENDING_WEST;
             if (vec.getZ() < 0 && vec.getZ() == vec.getY()) return RailShape.ASCENDING_SOUTH;
-            if (vec.getZ() > 0 && vec.getZ() == vec.getY()) return RailShape.ASCENDING_NORTH;
+            if (vec.getZ() > 0 && -vec.getZ() == vec.getY()) return RailShape.ASCENDING_NORTH;
         }
         if (vec.getX() != 0) {
             return RailShape.EAST_WEST;
