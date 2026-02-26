@@ -3,7 +3,9 @@ package nl.gjorgdy.flashcarts.mixins;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
+import net.minecraft.core.component.DataComponentType;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
@@ -114,30 +116,24 @@ public abstract class ServerPlayerMixin extends Player implements ISelectionHold
             return;
         }
 
-        BlockHitResult blockHit = PlayerUtils.rayCast(this, 4);
+        BlockHitResult blockHit = PlayerUtils.rayCast(this, blockInteractionRange());
         var targetBlockState = level().getBlockState(blockHit.getBlockPos());
         var endPos = targetBlockState.canBeReplaced()
                 ? blockHit.getBlockPos()
                 : blockHit.getBlockPos().relative(blockHit.getDirection());
 
-        if (currentPath == null || (targetBlockState.isAir() && currentPath.isValid()) || !endPos.equals(lookingAtPos)) {
-            lookingAtPos = endPos;
-            currentPath = RailUtils.getRailPath(level(), startPos, lookingAtPos);
-            assert blockDisplayEntityHandler != null;
-            blockDisplayEntityHandler.reset();
-        }
+        if (currentPath != null && (endPos.equals(lookingAtPos) || (targetBlockState.isAir() && !currentPath.isValid()))) return;
 
-        if (blockDisplayEntityHandler.count() > 0) {
-            return;
-        }
+        lookingAtPos = endPos;
+        currentPath = RailUtils.getRailPath(level(), startPos, lookingAtPos);
 
-        if (blockDisplayEntityHandler != null) {
-            blockDisplayEntityHandler.add(
-                level().getBlockState(startPos),
-                startPos,
-                0x44AA44
-            );
-        }
+        assert blockDisplayEntityHandler != null;
+        blockDisplayEntityHandler.resetCounter();
+        blockDisplayEntityHandler.add(
+            level().getBlockState(startPos),
+            startPos,
+            0x44AA44
+        );
 
         AtomicInteger i = new AtomicInteger(0);
         AtomicReference<BlockPos> pos = new AtomicReference<>(startPos);
@@ -150,14 +146,14 @@ public abstract class ServerPlayerMixin extends Player implements ISelectionHold
             var railBlockState = (prf != 0 && i.get() % prf == 0)
                     ? Blocks.POWERED_RAIL.defaultBlockState().setValue(PoweredRailBlock.SHAPE, shape)
                     : Blocks.RAIL.defaultBlockState().setValue(RailBlock.SHAPE, shape);
-            if (blockDisplayEntityHandler != null) {
-                blockDisplayEntityHandler.add(
-                    railBlockState,
-                    pos.get(),
-                    currentPath.isValid() ? 0xFFFFFF : 0xFF0000
-                );
-            }
+            blockDisplayEntityHandler.add(
+                railBlockState,
+                pos.get(),
+                currentPath.isValid() ? 0xFFFFFF : 0xFF0000
+            );
         });
+
+        blockDisplayEntityHandler.removeOld();
     }
 
 }
