@@ -139,6 +139,8 @@ public abstract class ServerPlayerMixin extends Player implements ISelectionHold
         AtomicReference<BlockPos> pos = new AtomicReference<>(startPos);
         int prf = Flashcarts.config.getBuildConfig().getPoweredRailFrequency();
 
+        boolean pathValid = currentPath.isValid() && !targetBlockState.isAir();
+
         ListUtils.biIterate(currentPath.path(), (vec, nextVec) -> {
             pos.set(pos.get().offset(vec));
             i.getAndAdd(vec.getX() + vec.getZ());
@@ -149,7 +151,7 @@ public abstract class ServerPlayerMixin extends Player implements ISelectionHold
             blockDisplayEntityHandler.add(
                 railBlockState,
                 pos.get(),
-                currentPath.isValid() ? 0xFFFFFF : 0xFF0000
+                pathValid ? 0xFFFFFF : 0xFF0000
             );
         });
 
