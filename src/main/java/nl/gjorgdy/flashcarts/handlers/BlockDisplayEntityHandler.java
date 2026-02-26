@@ -32,6 +32,10 @@ public class BlockDisplayEntityHandler {
         topId = Integer.MAX_VALUE -1;
     }
 
+    public int count() {
+        return Integer.MAX_VALUE - topId - 1;
+    }
+
     public void add(BlockState blockState, BlockPos pos, int color) {
         var displayEntity = EntityType.BLOCK_DISPLAY.create(
                 player.level(),

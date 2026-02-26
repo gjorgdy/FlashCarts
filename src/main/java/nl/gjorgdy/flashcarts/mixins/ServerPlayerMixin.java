@@ -29,10 +29,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.BiConsumer;
 
 @Mixin(ServerPlayer.class)
 public abstract class ServerPlayerMixin extends Player implements ISelectionHolder {
@@ -107,20 +105,23 @@ public abstract class ServerPlayerMixin extends Player implements ISelectionHold
             return;
         }
 
-        BlockHitResult blockHit = PlayerUtils.rayCast(this, 8);
+        BlockHitResult blockHit = PlayerUtils.rayCast(this, 5);
         var startPos = flashCarts$getStartPointPos();
         assert startPos != null;
 
+        var target = blockHit.getBlockPos();
         var endPos = blockHit.getBlockPos().relative(blockHit.getDirection());
 
-        if (endPos.equals(lookingAtPos) && currentPath != null) {
-            return;
+        if (!level().getBlockState(target).isAir() && (!endPos.equals(lookingAtPos) || currentPath == null)) {
+            lookingAtPos = endPos;
+            currentPath = RailUtils.getRailPath(level(), startPos, lookingAtPos);
+            assert blockDisplayEntityHandler != null;
+            blockDisplayEntityHandler.reset();
         }
 
-        lookingAtPos = endPos;
-        currentPath = RailUtils.getRailPath(level(), startPos, lookingAtPos);
-        assert blockDisplayEntityHandler != null;
-        blockDisplayEntityHandler.reset();
+        if (blockDisplayEntityHandler.count() > 0) {
+            return;
+        }
 
         if (blockDisplayEntityHandler != null) {
             blockDisplayEntityHandler.add(
