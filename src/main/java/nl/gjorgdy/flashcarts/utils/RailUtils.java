@@ -111,22 +111,25 @@ public abstract class RailUtils {
     }
 
     public static RailShape getRailShape(Vec3i vec, @Nullable Vec3i nextVec) {
-        if (vec.getY() >= 0 && (nextVec == null || nextVec.getY() <= 0) || (vec.getX() != vec.getY() && vec.getZ() != vec.getY())) {
-            if (vec.getX() != 0) {
-                return RailShape.EAST_WEST;
-            } else {
-                return RailShape.NORTH_SOUTH;
-            }
+        // check nextVec for ascending rails,
+        // this is needed because of optimizations in the pathfinding
+        if (nextVec != null && nextVec.getY() > 0) {
+            if (nextVec.getX() > 0) return RailShape.ASCENDING_EAST;
+            if (nextVec.getX() < 0) return RailShape.ASCENDING_WEST;
+            if (nextVec.getZ() > 0) return RailShape.ASCENDING_SOUTH;
+            if (nextVec.getZ() < 0) return RailShape.ASCENDING_NORTH;
+        }
+        // descending rails can be checked on the current vector
+        if (vec.getY() < 0) {
+            if (vec.getX() < 0 && vec.getX() == vec.getY()) return RailShape.ASCENDING_EAST;
+            if (vec.getX() > 0 && vec.getX() == vec.getY()) return RailShape.ASCENDING_WEST;
+            if (vec.getZ() < 0 && vec.getZ() == vec.getY()) return RailShape.ASCENDING_SOUTH;
+            if (vec.getZ() > 0 && vec.getZ() == vec.getY()) return RailShape.ASCENDING_NORTH;
+        }
+        if (vec.getX() != 0) {
+            return RailShape.EAST_WEST;
         } else {
-            if ((nextVec != null && nextVec.getY() > 0 && vec.getX() > 0) || (vec.getY() < 0 && vec.getX() < 0)) {
-                return RailShape.ASCENDING_EAST;
-            } else if ((nextVec != null && nextVec.getY() > 0 && vec.getX() < 0) || (vec.getY() < 0 && vec.getX() > 0)) {
-                return RailShape.ASCENDING_WEST;
-            } else if ((nextVec != null && nextVec.getY() > 0 && vec.getZ() > 0) || (vec.getY() < 0 && vec.getZ() < 0)) {
-                return RailShape.ASCENDING_SOUTH;
-            } else {
-                return RailShape.ASCENDING_NORTH;
-            }
+            return RailShape.NORTH_SOUTH;
         }
     }
 
