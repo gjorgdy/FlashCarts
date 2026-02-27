@@ -30,10 +30,12 @@ public class UseBlockCallbackListener implements UseBlockCallback {
             if (Flashcarts.config.getBuildConfig().isRailSelectionBuildingEnabled() && !player.isCrouching()) {
                 if (player instanceof ISelectionHolder selectionHolder) {
                     var cachedPos = selectionHolder.flashCarts$getStartPointPos();
-                    if (cachedPos == null || !cachedPos.equals(blockHit.getBlockPos())) {
+                    if (cachedPos == null) {
                         select(player, blockHit.getBlockPos(), level);
+                    } else if (cachedPos.equals(blockHit.getBlockPos())) {
+                        clear(player, selectionHolder);
                     } else {
-                        clear(player);
+                        return buildSelection(player, selectionHolder, level, interactionHand, blockHit);
                     }
                 }
             // rail extension
@@ -51,48 +53,53 @@ public class UseBlockCallbackListener implements UseBlockCallback {
             if (!Flashcarts.config.getBuildConfig().isRailSelectionBuildingEnabled()) return InteractionResult.PASS;
             if (player instanceof ISelectionHolder selectionHolder && selectionHolder.flashCarts$isStartPointSet()) {
                 if (player.isCrouching()) {
-                    clear(player);
+                    clear(player, selectionHolder);
                     player.swing(interactionHand, true);
                     return InteractionResult.SUCCESS;
                 }
-                if (selectionHolder.flashCarts$getStartPointLevel() != level) {
-                    player.displayClientMessage(Component.literal("§cNo valid rail path found!"), true);
-                    player.swing(interactionHand, true);
-                    return InteractionResult.FAIL;
-                }
-                var startPos = selectionHolder.flashCarts$getStartPointPos();
-                assert startPos != null;
-                var endPos = level.getBlockState(blockHit.getBlockPos()).canBeReplaced()
-                        ? blockHit.getBlockPos()
-                        : blockHit.getBlockPos().relative(blockHit.getDirection());
-                var path = RailUtils.getRailPath(level, startPos, endPos);
-
-                if (!path.isValid()) {
-                    player.displayClientMessage(Component.literal("§cNo valid rail path found!"), true);
-                    player.swing(interactionHand, true);
-                    return InteractionResult.FAIL;
-                } else {
-                    int i = 0;
-                    int prf = Flashcarts.config.getBuildConfig().getPoweredRailFrequency();
-                    var pos = startPos;
-                    for (var vec : path.path()) {
-                        pos = pos.offset(vec);
-                        i += vec.getX() + vec.getZ();
-                        var rail = (prf != 0 && i % prf == 0) ? Items.POWERED_RAIL : Items.RAIL;
-                        boolean placed = ItemUtils.place(rail, player, pos, SoundEvents.METAL_PLACE);
-                        if (!placed) break;
-                    }
-                }
-
-                if (player instanceof ServerPlayer splayer) {
-                    PlayerUtils.playDirectSound(splayer, SoundEvents.UI_BUTTON_CLICK.value(), SoundSource.BLOCKS);
-                    splayer.swing(interactionHand);
-                }
-                selectionHolder.flashCarts$clearStartPoint();
-                return InteractionResult.SUCCESS;
+                return buildSelection(player, selectionHolder, level, interactionHand, blockHit);
             }
         }
         return InteractionResult.PASS;
+    }
+
+    private static InteractionResult buildSelection(@NonNull Player player, ISelectionHolder selectionHolder, @NonNull Level level, @NonNull InteractionHand interactionHand, @NonNull BlockHitResult blockHit) {
+        if (selectionHolder.flashCarts$getStartPointLevel() != level) {
+            player.displayClientMessage(Component.literal("§cNo valid rail path found!"), true);
+            player.swing(interactionHand, true);
+            return InteractionResult.FAIL;
+        }
+        var startPos = selectionHolder.flashCarts$getStartPointPos();
+        assert startPos != null;
+        var targetBlockState = level.getBlockState(blockHit.getBlockPos());
+        var endPos = targetBlockState.canBeReplaced() || RailUtils.isRail(targetBlockState)
+                ? blockHit.getBlockPos()
+                : blockHit.getBlockPos().relative(blockHit.getDirection());
+        var path = RailUtils.getRailPath(level, startPos, endPos);
+
+        if (!path.isValid()) {
+            player.displayClientMessage(Component.literal("§cNo valid rail path found!"), true);
+            player.swing(interactionHand, true);
+            return InteractionResult.FAIL;
+        } else {
+            int i = 0;
+            int prf = Flashcarts.config.getBuildConfig().getPoweredRailFrequency();
+            var pos = startPos;
+            for (var vec : path.path()) {
+                pos = pos.offset(vec);
+                i += vec.getX() + vec.getZ();
+                var rail = (prf != 0 && i % prf == 0) ? Items.POWERED_RAIL : Items.RAIL;
+                boolean placed = ItemUtils.place(rail, player, pos, SoundEvents.METAL_PLACE);
+                if (!placed) break;
+            }
+        }
+
+        if (player instanceof ServerPlayer splayer) {
+            PlayerUtils.playDirectSound(splayer, SoundEvents.UI_BUTTON_CLICK.value(), SoundSource.BLOCKS);
+            splayer.swing(interactionHand);
+        }
+        selectionHolder.flashCarts$clearStartPoint();
+        return InteractionResult.SUCCESS;
     }
 
     private static void select(Player player, BlockPos blockPos, Level level) {
@@ -106,14 +113,12 @@ public class UseBlockCallbackListener implements UseBlockCallback {
         }
     }
 
-    private static void clear(Player player) {
-        if (player instanceof ISelectionHolder selectionHolder) {
-            selectionHolder.flashCarts$clearStartPoint();
-            if (player instanceof ServerPlayer splayer) {
-                splayer.displayClientMessage(Component.literal("§6Cleared selection"), true);
-                PlayerUtils.playDirectSound(splayer, SoundEvents.UI_BUTTON_CLICK.value(), SoundSource.BLOCKS);
-                splayer.swing(InteractionHand.MAIN_HAND);
-            }
+    private static void clear(Player player, ISelectionHolder selectionHolder) {
+        selectionHolder.flashCarts$clearStartPoint();
+        if (player instanceof ServerPlayer splayer) {
+            splayer.displayClientMessage(Component.literal("§6Cleared selection"), true);
+            PlayerUtils.playDirectSound(splayer, SoundEvents.UI_BUTTON_CLICK.value(), SoundSource.BLOCKS);
+            splayer.swing(InteractionHand.MAIN_HAND);
         }
     }
 

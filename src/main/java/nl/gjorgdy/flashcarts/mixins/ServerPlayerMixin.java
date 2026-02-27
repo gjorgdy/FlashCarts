@@ -79,6 +79,11 @@ public abstract class ServerPlayerMixin extends Player implements ISelectionHold
     public void flashCarts$setStartPoint(BlockPos pos, Level level) {
         startPointPos = pos;
         startPointLevel = level;
+        currentPath = null;
+        lookingAtPos = null;
+        if (blockDisplayEntityHandler != null) {
+            blockDisplayEntityHandler.reset();
+        }
     }
 
     @Override
@@ -90,6 +95,11 @@ public abstract class ServerPlayerMixin extends Player implements ISelectionHold
     public void flashCarts$clearStartPoint() {
         startPointPos = null;
         startPointLevel = null;
+        currentPath = null;
+        lookingAtPos = null;
+        if (blockDisplayEntityHandler != null) {
+            blockDisplayEntityHandler.reset();
+        }
     }
 
     @Inject(method = "tick", at = @At("TAIL"))
@@ -118,7 +128,7 @@ public abstract class ServerPlayerMixin extends Player implements ISelectionHold
 
         BlockHitResult blockHit = PlayerUtils.rayCast(this, blockInteractionRange());
         var targetBlockState = level().getBlockState(blockHit.getBlockPos());
-        var endPos = targetBlockState.canBeReplaced()
+        var endPos = targetBlockState.canBeReplaced() || RailUtils.isRail(targetBlockState)
                 ? blockHit.getBlockPos()
                 : blockHit.getBlockPos().relative(blockHit.getDirection());
 

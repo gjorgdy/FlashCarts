@@ -137,6 +137,10 @@ public abstract class RailUtils {
         return level.getBlockState(pos).getBlock() instanceof BaseRailBlock;
     }
 
+    public static boolean isRail(BlockState blockState) {
+        return blockState.getBlock() instanceof BaseRailBlock;
+    }
+
     private static boolean canBePlaced(Level level, BlockPos pos) {
         if (Blocks.RAIL instanceof BaseRailBlockInvoker invoker) {
             return level.getBlockState(pos).canBeReplaced()

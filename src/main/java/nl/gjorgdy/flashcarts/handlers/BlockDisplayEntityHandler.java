@@ -31,6 +31,7 @@ public class BlockDisplayEntityHandler {
             )
         );
         resetCounter();
+        oldTopId = Integer.MAX_VALUE -1;
     }
 
     public void resetCounter() {
