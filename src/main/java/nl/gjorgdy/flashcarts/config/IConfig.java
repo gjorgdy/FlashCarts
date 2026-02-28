@@ -18,7 +18,7 @@ public interface IConfig {
 	int default_railSelectionBuildingMaxDistance = 64;
 	int default_poweredRailFrequency = 8;
 	boolean default_showSelection = true;
-	boolean default_railExtendBuildingEnabled = true;
+	boolean default_railExtendBuildingEnabled = false;
 	int default_railExtendBuildingMaxDistance = 16;
 
 	float default_poweredRailBoostPercentage = 0.12f;
