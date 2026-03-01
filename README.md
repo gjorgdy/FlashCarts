@@ -1,5 +1,5 @@
+![A player in a minecart going very fast](https://cdn.modrinth.com/data/cached_images/aa5139a381dfdf9e1ec2797f88542852935573f1.webp)
 <center>
-    <h1>TO-DO: Add banner image</h1>
   Minecarts are arguably the best transport in Minecraft, but they can be better
 </center>
 
@@ -17,6 +17,8 @@ Because of this, the mod only applies the new physics where you would benefit fr
 
 By default, the new physics are applied to normal and TNT minecarts, but not to chest, furnace, or hopper minecarts.
 
+![A normal minecraft using a different physics system than a chest minecart](https://cdn.modrinth.com/data/cached_images/a6e3345ce1fde6c5247d474b99ef5c1601e25499.webp)
+
 ### Building tools
 
 To make building of minecart tracks easier, Flash Carts adds selection placing inspired by the Create mod.
@@ -25,20 +27,34 @@ To start, right-click a rail block with a rail in your hand, and a preview of th
 
 > For people who want a more vanilla experience, Flash Carts also adds an 'extend' build mode which can be enabled in the config.
 
+![A rail being built across a bridge using selections](https://cdn.modrinth.com/data/cached_images/a895d7390749274bf1d5e64760d2802531848b98.webp)
+
 ### Speed HUD
 
 To make sure you use the new maximum speeds to their full potential, a speedometer and speedbar show up when you are in a minecart.
 
+![Speedometer showing the current speed of a minecart in the action bar](https://cdn.modrinth.com/data/cached_images/cbda492ba396d3d4478fd3770f91b36dfe4857df_0.webp)
+
 ### Station Titles
 
-To make Minecarts more convenient to create transport networks, a station can show its name when you are standing still on top of it. 
+To make Minecarts more convenient to create transport networks, a station can show its name when you are standing still on top of it.
 
 To set a station's name, place a sign under the block where a Minecart stands still, and write the station name on the first line of the sign.
 Any extra lines on the sign will be combined into the subtitle under the station name.
 
+![The title of a station and the sign making it possible](https://cdn.modrinth.com/data/cached_images/5d2e65d81feb46b33a9353666fa8cbd58d773066_0.webp)
+
 ### Minecart 'Crashes'
 
 To deal with people leaving minecarts hanging around, a minecart with a passenger will cause colliding empty minecarts to break without affecting its own speed.
+
+![A minecart with a player in it crashing through a still standing cart](https://cdn.modrinth.com/data/cached_images/85e0f26b6f6961d62f10626db0c169a489a84f76.webp)
+
+### Rail recipes
+
+To make building railways a bit more do-able early game, Flash Carts adds some alternative recipes for rails like being able to use Copper instead of Gold for Powered Rails.
+
+![A custom recipe for Powered Rail with Copper instead of Gold.](https://cdn.modrinth.com/data/cached_images/b1afca4f1db77be4f53b8fc22f26bfe78730bc3b.webp)
 
 <br>
 
