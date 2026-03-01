@@ -61,6 +61,18 @@ public class FzzyConfig extends Config implements IConfig {
 	@Comment("Configuration for TNT minecarts")
 	private FzzyCartConfig tntMinecart = new FzzyCartConfig(default_tntUseExperimentalPhysics, default_tntMaxSpeed);
 
+	@Comment("Configuration for chest minecarts")
+	private FzzyCartConfig chestMinecart = new FzzyCartConfig(default_redstoneCartsUseExperimentalPhysics, default_redstoneCartsMaxSpeed);
+
+	@Comment("Configuration for hopper minecarts")
+	private FzzyCartConfig hopperMinecart = new FzzyCartConfig(default_redstoneCartsUseExperimentalPhysics, default_redstoneCartsMaxSpeed);
+
+	@Comment("Configuration for furnace minecarts")
+	private FzzyCartConfig furnaceMinecart = new FzzyCartConfig(default_redstoneCartsUseExperimentalPhysics, default_redstoneCartsMaxSpeed);
+
+	@Comment("Configuration for command block minecarts")
+	private FzzyCartConfig commandBlockMinecart = new FzzyCartConfig(default_redstoneCartsUseExperimentalPhysics, default_redstoneCartsMaxSpeed);
+
 	@Override
 	public boolean areCheaperRecipesEnabled() {
 		return cheaperRecipes;
@@ -84,6 +96,26 @@ public class FzzyConfig extends Config implements IConfig {
 	@Override
 	public ICartConfig getTntMinecartConfig() {
 		return tntMinecart;
+	}
+
+	@Override
+	public ICartConfig getChestMinecartConfig() {
+		return chestMinecart;
+	}
+
+	@Override
+	public ICartConfig getHopperMinecartConfig() {
+		return hopperMinecart;
+	}
+
+	@Override
+	public ICartConfig getFurnaceMinecartConfig() {
+		return furnaceMinecart;
+	}
+
+	@Override
+	public ICartConfig getCommandBlockMinecartConfig() {
+		return commandBlockMinecart;
 	}
 
 	@Override

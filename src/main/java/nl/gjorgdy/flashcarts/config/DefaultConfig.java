@@ -91,6 +91,18 @@ public class DefaultConfig implements IConfig {
 		}
 	};
 
+	private static final ICartConfig default_redstoneCartsConfig = new ICartConfig() {
+		@Override
+		public boolean shouldUseExperimentalPhysics() {
+			return default_redstoneCartsUseExperimentalPhysics;
+		}
+
+		@Override
+		public int getMaxSpeed() {
+			return default_redstoneCartsMaxSpeed;
+		}
+	};
+
 	@Override
 	public ICartConfig getEmptyMinecartConfig() {
 		return default_emptyMinecartConfig;
@@ -109,6 +121,26 @@ public class DefaultConfig implements IConfig {
 	@Override
 	public ICartConfig getTntMinecartConfig() {
 		return default_tntMinecartConfig;
+	}
+
+	@Override
+	public ICartConfig getChestMinecartConfig() {
+		return default_redstoneCartsConfig;
+	}
+
+	@Override
+	public ICartConfig getHopperMinecartConfig() {
+		return default_redstoneCartsConfig;
+	}
+
+	@Override
+	public ICartConfig getFurnaceMinecartConfig() {
+		return default_redstoneCartsConfig;
+	}
+
+	@Override
+	public ICartConfig getCommandBlockMinecartConfig() {
+		return default_redstoneCartsConfig;
 	}
 
 	@Override

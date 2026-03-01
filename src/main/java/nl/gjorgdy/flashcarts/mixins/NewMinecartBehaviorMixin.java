@@ -1,5 +1,7 @@
 package nl.gjorgdy.flashcarts.mixins;
 
+import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.vehicle.minecart.AbstractMinecart;
 import net.minecraft.world.entity.vehicle.minecart.MinecartBehavior;
@@ -7,7 +9,6 @@ import net.minecraft.world.entity.vehicle.minecart.NewMinecartBehavior;
 import nl.gjorgdy.flashcarts.Flashcarts;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.*;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(NewMinecartBehavior.class)
 public abstract class NewMinecartBehaviorMixin extends MinecartBehavior {
@@ -16,14 +17,13 @@ public abstract class NewMinecartBehaviorMixin extends MinecartBehavior {
 		super(abstractMinecart);
 	}
 
-	@Inject(at = @At("HEAD"), method = "getMaxSpeed", cancellable = true)
-	public void overrideMaxSpeed(ServerLevel level, CallbackInfoReturnable<Double> cir) {
+	@WrapMethod(method = "getMaxSpeed")
+	public double overrideMaxSpeed(ServerLevel serverLevel, Operation<Double> original) {
 		var cartConfig = Flashcarts.config.getConfigForMinecart(minecart);
-		if (cartConfig == null || !cartConfig.shouldUseExperimentalPhysics()) {
-			return;
-		}
-		cir.setReturnValue(cartConfig.getMaxSpeed() * (this.minecart.isInWater() ? 0.5 : 1.0) / 20.0);
-		cir.cancel();
+		int maxSpeed = cartConfig != null && cartConfig.shouldUseExperimentalPhysics()
+				? cartConfig.getMaxSpeed()
+				: 8;
+		return maxSpeed * (this.minecart.isInWater() ? 0.5 : 1.0) / 20.0;
 	}
 
 	@ModifyConstant(

@@ -1,9 +1,7 @@
 package nl.gjorgdy.flashcarts.config;
 
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.vehicle.minecart.AbstractMinecart;
-import net.minecraft.world.entity.vehicle.minecart.Minecart;
-import net.minecraft.world.entity.vehicle.minecart.MinecartTNT;
+import net.minecraft.world.entity.vehicle.minecart.*;
 import org.jspecify.annotations.Nullable;
 
 public interface IConfig {
@@ -36,6 +34,9 @@ public interface IConfig {
 
 	boolean default_tntUseExperimentalPhysics = true;
 	int default_tntMaxSpeed = 32;
+
+	boolean default_redstoneCartsUseExperimentalPhysics = false;
+	int default_redstoneCartsMaxSpeed = 8;
 
 	/**
 	 * Whether to enable cheaper recipes for rails and minecarts.
@@ -109,6 +110,30 @@ public interface IConfig {
 	 */
 	ICartConfig getTntMinecartConfig();
 
+	/**
+	 * Get the configuration for chest minecarts.
+	 * @return the configuration for chest minecarts.
+	 */
+	ICartConfig getChestMinecartConfig();
+
+	/**
+	 * Get the configuration for hopper minecarts.
+	 * @return the configuration for hopper minecarts.
+	 */
+	ICartConfig getHopperMinecartConfig();
+
+	/**
+	 * Get the configuration for furnace minecarts.
+	 * @return the configuration for furnace minecarts.
+	 */
+	ICartConfig getFurnaceMinecartConfig();
+
+	/**
+	 * Get the configuration for command block minecarts.
+	 * @return the configuration for command block minecarts.
+	 */
+	ICartConfig getCommandBlockMinecartConfig();
+
 	@Nullable
 	default ICartConfig getConfigForMinecart(AbstractMinecart minecart) {
 		if (minecart instanceof MinecartTNT) return getTntMinecartConfig();
@@ -117,6 +142,10 @@ public interface IConfig {
 			if (minecart.getFirstPassenger() instanceof Player) return getPlayerMinecartConfig();
 			if (!minecart.getPassengers().isEmpty()) return getMobMinecartConfig();
 		}
+		if (minecart instanceof MinecartChest) return getChestMinecartConfig();
+		if (minecart instanceof MinecartHopper) return getHopperMinecartConfig();
+		if (minecart instanceof MinecartFurnace) return getFurnaceMinecartConfig();
+		if (minecart instanceof MinecartCommandBlock) return getCommandBlockMinecartConfig();
 		return null;
 	}
 
