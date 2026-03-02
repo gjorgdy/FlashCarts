@@ -12,6 +12,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseRailBlock;
+import net.minecraft.world.level.block.state.properties.RailShape;
 import net.minecraft.world.phys.BlockHitResult;
 import nl.gjorgdy.flashcarts.Flashcarts;
 import nl.gjorgdy.flashcarts.interfaces.ISelectionHolder;
@@ -88,7 +89,10 @@ public class UseBlockCallbackListener implements UseBlockCallback {
             for (var vec : path.path()) {
                 pos = pos.offset(vec);
                 i += vec.getX() + vec.getZ();
-                var rail = (prf != 0 && i % prf == 0) ? Items.POWERED_RAIL : Items.RAIL;
+                var rail = RailUtils.getBlockItem(
+                    prf, i,
+                    player.getItemInHand(interactionHand).getItem()
+                );
                 boolean placed = ItemUtils.place(rail, player, pos, SoundEvents.METAL_PLACE);
                 if (!placed) break;
             }

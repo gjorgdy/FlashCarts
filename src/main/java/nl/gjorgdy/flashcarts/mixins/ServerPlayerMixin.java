@@ -7,12 +7,13 @@ import net.minecraft.core.component.DataComponentType;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.BaseRailBlock;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.PoweredRailBlock;
-import net.minecraft.world.level.block.RailBlock;
+import net.minecraft.world.level.block.*;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.RailShape;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import nl.gjorgdy.flashcarts.Flashcarts;
@@ -34,6 +35,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.BiFunction;
 
 @Mixin(ServerPlayer.class)
 public abstract class ServerPlayerMixin extends Player implements ISelectionHolder {
@@ -154,12 +156,13 @@ public abstract class ServerPlayerMixin extends Player implements ISelectionHold
         ListUtils.biIterate(currentPath.path(), (vec, nextVec) -> {
             pos.set(pos.get().offset(vec));
             i.getAndAdd(vec.getX() + vec.getZ());
-            var shape = RailUtils.getRailShape(vec, nextVec);
-            var railBlockState = (prf != 0 && i.get() % prf == 0)
-                    ? Blocks.POWERED_RAIL.defaultBlockState().setValue(PoweredRailBlock.SHAPE, shape)
-                    : Blocks.RAIL.defaultBlockState().setValue(RailBlock.SHAPE, shape);
             blockDisplayEntityHandler.add(
-                railBlockState,
+                RailUtils.getBlockState(
+                    prf,
+                    i.get(),
+                    getActiveItem().getItem(),
+                    RailUtils.getRailShape(vec, nextVec)
+                ),
                 pos.get(),
                 pathValid ? 0xFFFFFF : 0xFF0000
             );

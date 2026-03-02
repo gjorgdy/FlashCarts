@@ -6,7 +6,10 @@ import net.minecraft.core.Vec3i;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.BlockState;
@@ -15,6 +18,7 @@ import nl.gjorgdy.flashcarts.Flashcarts;
 import nl.gjorgdy.flashcarts.mixins.BaseRailBlockInvoker;
 import nl.gjorgdy.flashcarts.objects.RailPath;
 import org.jspecify.annotations.Nullable;
+import org.spongepowered.asm.mixin.Unique;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -155,6 +159,39 @@ public abstract class RailUtils {
 
     private static RailShape getRailShape(BlockState state) {
         return state.getValueOrElse(PoweredRailBlock.SHAPE, state.getValueOrElse(RailBlock.SHAPE, RailShape.NORTH_SOUTH));
+    }
+
+    public static BlockState getBlockState(int poweredRailFrequency, int i, Item heldItem, RailShape shape) {
+        if (poweredRailFrequency != 0) {
+            return  (i % poweredRailFrequency == 0)
+                    ? Blocks.POWERED_RAIL.defaultBlockState().setValue(PoweredRailBlock.SHAPE, shape)
+                    : Blocks.RAIL.defaultBlockState().setValue(RailBlock.SHAPE, shape);
+        }
+        if (heldItem instanceof BlockItem blockItem) {
+            var block = blockItem.getBlock();
+            switch (block) {
+                case RailBlock ignored -> {
+                    return block.defaultBlockState().setValue(RailBlock.SHAPE, shape);
+                }
+                case PoweredRailBlock ignored -> {
+                    return block.defaultBlockState().setValue(PoweredRailBlock.SHAPE, shape);
+                }
+                case DetectorRailBlock ignored -> {
+                    return block.defaultBlockState().setValue(DetectorRailBlock.SHAPE, shape);
+                }
+                default -> {}
+            }
+        }
+        return Blocks.RAIL.defaultBlockState().setValue(RailBlock.SHAPE, shape);
+    }
+
+    public static Item getBlockItem(int poweredRailFrequency, int i, Item heldItem) {
+        if (poweredRailFrequency != 0) {
+            return  (i % poweredRailFrequency == 0)
+                ? Items.POWERED_RAIL
+                : Items.RAIL;
+        }
+        return heldItem;
     }
 
 }
