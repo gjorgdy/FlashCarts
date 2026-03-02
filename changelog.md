@@ -1,4 +1,4 @@
-﻿Pre-Release
+﻿Initial Release
 ---
 
-- Pre-release for verification by Modrinth.
+- First release of the mod
