@@ -30,7 +30,7 @@ public class BlockDisplayEntityHandler {
                 IntStream.rangeClosed(topId, Integer.MAX_VALUE - 1).toArray()
             )
         );
-        resetCounter();
+        topId = Integer.MAX_VALUE -1;
         oldTopId = Integer.MAX_VALUE -1;
     }
 
