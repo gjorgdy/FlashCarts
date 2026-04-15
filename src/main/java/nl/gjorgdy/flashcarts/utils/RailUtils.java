@@ -18,7 +18,6 @@ import nl.gjorgdy.flashcarts.Flashcarts;
 import nl.gjorgdy.flashcarts.mixins.BaseRailBlockInvoker;
 import nl.gjorgdy.flashcarts.objects.RailPath;
 import org.jspecify.annotations.Nullable;
-import org.spongepowered.asm.mixin.Unique;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -145,6 +144,10 @@ public abstract class RailUtils {
         return blockState.getBlock() instanceof BaseRailBlock;
     }
 
+    public static boolean isSlope(BlockState blockState) {
+        return isRail(blockState) && getRailShape(blockState).isSlope();
+    }
+
     private static boolean canBePlaced(Level level, BlockPos pos) {
         if (Blocks.RAIL instanceof BaseRailBlockInvoker invoker) {
             return level.getBlockState(pos).canBeReplaced()
@@ -153,11 +156,15 @@ public abstract class RailUtils {
         return false;
     }
 
+    public static boolean isXAxis(BlockState blockState) {
+        return isRail(blockState) && isXAxis(getRailShape(blockState));
+    }
+
     private static boolean isXAxis(RailShape shape) {
         return (shape == RailShape.EAST_WEST) || (shape == RailShape.ASCENDING_EAST) || (shape == RailShape.ASCENDING_WEST);
     }
 
-    private static RailShape getRailShape(BlockState state) {
+    public static RailShape getRailShape(BlockState state) {
         return state.getValueOrElse(PoweredRailBlock.SHAPE, state.getValueOrElse(RailBlock.SHAPE, RailShape.NORTH_SOUTH));
     }
 

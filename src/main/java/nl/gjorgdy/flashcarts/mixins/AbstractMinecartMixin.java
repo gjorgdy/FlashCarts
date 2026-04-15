@@ -2,7 +2,7 @@ package nl.gjorgdy.flashcarts.mixins;
 
 import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
-import net.minecraft.core.BlockPos;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EntityType;
@@ -12,7 +12,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.SignBlockEntity;
 import nl.gjorgdy.flashcarts.Flashcarts;
 import nl.gjorgdy.flashcarts.utils.TitleUtils;
-import org.jspecify.annotations.Nullable;
 import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -34,6 +33,12 @@ public abstract class AbstractMinecartMixin extends VehicleEntity {
 
 	public AbstractMinecartMixin(EntityType<?> entityType, Level level) {
 		super(entityType, level);
+	}
+
+	@WrapOperation(method = "<init>(Lnet/minecraft/world/entity/EntityType;Lnet/minecraft/world/level/Level;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/vehicle/minecart/AbstractMinecart;useExperimentalMovement(Lnet/minecraft/world/level/Level;)Z"))
+	private boolean constructor(Level level, Operation<Boolean> original) {
+		var cartConfig = Flashcarts.config.getConfigForMinecart(self);
+		return cartConfig != null && cartConfig.shouldUseExperimentalPhysics();
 	}
 
 	@WrapMethod(method = "useExperimentalMovement")
@@ -92,27 +97,21 @@ public abstract class AbstractMinecartMixin extends VehicleEntity {
 			}
 		});
 		if (tickCount % 5 != 0) return;
-		// check if minecart should switch physics behavior
+		setBehavior();
+	}
+
+	@Unique
+	private void setBehavior() {
 		var cartConfig = Flashcarts.config.getConfigForMinecart(self);
 		if (cartConfig != null && cartConfig.shouldUseExperimentalPhysics()) {
-			setNewMinecartBehavior();
+			if (this.behavior instanceof OldMinecartBehavior) {
+				this.behavior = new NewMinecartBehavior(self);
+			}
 		}
 		else {
-			setOldMinecartBehavior();
-		}
-	}
-
-	@Unique
-	private void setNewMinecartBehavior() {
-		if (this.behavior instanceof OldMinecartBehavior) {
-			this.behavior = new NewMinecartBehavior(self);
-		}
-	}
-
-	@Unique
-	private void setOldMinecartBehavior() {
-		if (this.behavior instanceof NewMinecartBehavior) {
-			this.behavior = new OldMinecartBehavior(self);
+			if (this.behavior instanceof NewMinecartBehavior) {
+				this.behavior = new OldMinecartBehavior(self);
+			}
 		}
 	}
 
