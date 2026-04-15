@@ -5,6 +5,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntitySelector;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.vehicle.minecart.AbstractMinecart;
 import net.minecraft.world.entity.vehicle.minecart.Minecart;
 import net.minecraft.world.level.Level;
@@ -48,35 +49,28 @@ public abstract class EntityMixin {
 
 	@Inject(method = "setOnGroundWithMovement(ZZLnet/minecraft/world/phys/Vec3;)V", at = @At("HEAD"))
 	public void onPush(boolean bl, boolean horizontalCollision, Vec3 vec3, CallbackInfo ci) {
-		if (level().isClientSide()) return;
-		if (!horizontalCollision) {
-			return;
-		}
-		if ((((Object) this) instanceof AbstractMinecart minecart)) {
+		if (level().isClientSide() || !horizontalCollision) return;
+		if (self instanceof AbstractMinecart minecart) {
+			if (minecart.getPassengers().isEmpty()) return;
+			// calculation math
 			var collisionBox = minecart.getBoundingBox().inflate(1.0E-7);
 			List<Entity> list = minecart.level().getEntities(minecart, collisionBox, EntitySelector.pushableBy(minecart));
-			if (!list.isEmpty()) {
-				for (Entity entity : list) {
-					if (entity instanceof AbstractMinecart colliderMinecart) {
-						this.onCollide(colliderMinecart, minecart);
+			if (list.isEmpty()) return;
+			// handle collisions
+			for (Entity entity : list) {
+				if (entity == minecart.getFirstPassenger()) continue;
+				if (entity instanceof AbstractMinecart colliderMinecart) {
+					var colliderSpeed = colliderMinecart.getKnownMovement().length();
+					var selfSpeed = minecart.getKnownMovement().length();
+					// Ignore same speed and passengers with carts
+					if (colliderSpeed == selfSpeed || !colliderMinecart.getPassengers().isEmpty()) return;
+					// Destroy empty cart
+					if (colliderSpeed < selfSpeed && colliderMinecart instanceof VehicleEntityInvoker collider) {
+						collider.flash_cart$destroy((ServerLevel) colliderMinecart.level(), collider.flash_cart$getDropItem());
+					} else if (minecart instanceof VehicleEntityInvoker selfMinecart) {
+						selfMinecart.flash_cart$destroy((ServerLevel) minecart.level(), selfMinecart.flash_cart$getDropItem());
 					}
 				}
-			}
-		}
-	}
-
-	@Unique
-	private void onCollide(AbstractMinecart collider, AbstractMinecart self) {
-		if (collider.getKnownMovement().length() == self.getKnownMovement().length()) {
-			return;
-		}
-		if (collider.getKnownMovement().length() < self.getKnownMovement().length()) {
-			if (self.countPlayerPassengers() >= 1 && collider.countPlayerPassengers() == 0 && collider instanceof VehicleEntityInvoker colliderMinecart) {
-				colliderMinecart.flash_cart$destroy((ServerLevel) collider.level(), colliderMinecart.flash_cart$getDropItem());
-			}
-		} else {
-			if (collider.countPlayerPassengers() >= 1 && self.countPlayerPassengers() == 0 && self instanceof VehicleEntityInvoker selfMinecart) {
-				selfMinecart.flash_cart$destroy((ServerLevel) self.level(), selfMinecart.flash_cart$getDropItem());
 			}
 		}
 	}
