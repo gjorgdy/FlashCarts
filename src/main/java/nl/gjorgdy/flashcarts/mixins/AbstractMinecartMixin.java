@@ -1,5 +1,7 @@
 package nl.gjorgdy.flashcarts.mixins;
 
+import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
@@ -32,6 +34,11 @@ public abstract class AbstractMinecartMixin extends VehicleEntity {
 
 	public AbstractMinecartMixin(EntityType<?> entityType, Level level) {
 		super(entityType, level);
+	}
+
+	@WrapMethod(method = "useExperimentalMovement")
+	private static boolean shouldUseExperimentalMovement(Level level, Operation<Boolean> original) {
+		return true;
 	}
 
 	@Inject(at = @At("HEAD"), method = "tick")
