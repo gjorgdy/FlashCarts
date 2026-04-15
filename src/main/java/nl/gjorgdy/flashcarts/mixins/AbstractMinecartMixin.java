@@ -36,13 +36,18 @@ public abstract class AbstractMinecartMixin extends VehicleEntity {
 	}
 
 	@WrapOperation(method = "<init>(Lnet/minecraft/world/entity/EntityType;Lnet/minecraft/world/level/Level;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/vehicle/minecart/AbstractMinecart;useExperimentalMovement(Lnet/minecraft/world/level/Level;)Z"))
-	private boolean constructor(Level level, Operation<Boolean> original) {
+	private boolean initWithCorrectBehavior(Level level, Operation<Boolean> original) {
 		var cartConfig = Flashcarts.config.getConfigForMinecart(self);
 		return cartConfig != null && cartConfig.shouldUseExperimentalPhysics();
 	}
 
+	@Inject(method = "<init>(Lnet/minecraft/world/entity/EntityType;Lnet/minecraft/world/level/Level;)V", at= @At("RETURN"))
+	public void forceSync(EntityType<?> entityType, Level level, CallbackInfo ci) {
+		needsSync = true;
+	}
+
 	@WrapMethod(method = "useExperimentalMovement")
-	private static boolean shouldUseExperimentalMovement(Level level, Operation<Boolean> original) {
+	private static boolean forceExperimentalMovement(Level level, Operation<Boolean> original) {
 		return true;
 	}
 
@@ -59,16 +64,11 @@ public abstract class AbstractMinecartMixin extends VehicleEntity {
 					if (speedBar) {
 						int bars = (int) Math.floor(speed / Flashcarts.config.getPlayerMinecartConfig().getMaxSpeed() * 10);
 						stringBuilder
-								.append("§a")
-								.append("▮".repeat(Math.min(bars, 6)))
-								.append("§e")
-								.append("▮".repeat(Math.clamp(bars - 6, 0, 2)))
-								.append("§6")
-								.append("▮".repeat(Math.clamp(bars - 8, 0, 1)))
-								.append("§c")
-								.append("▮".repeat(Math.clamp(bars - 9, 0, 1)))
-								.append("§7")
-								.append("▮".repeat(10 - bars));
+							.append("§a").repeat("▮", Math.min(bars, 6))
+							.append("§e").repeat("▮", Math.clamp(bars - 6, 0, 2))
+							.append("§6").repeat("▮", Math.clamp(bars - 8, 0, 1))
+							.append("§c").repeat("▮", Math.clamp(bars - 9, 0, 1))
+							.append("§7").repeat("▮", 10 - bars);
 					}
 					if (speedometer) {
 						stringBuilder.append(String.format(" %,6.2f b/s", speed));
@@ -79,9 +79,7 @@ public abstract class AbstractMinecartMixin extends VehicleEntity {
 					}
 				} else {
 					if (speedBar) {
-						stringBuilder
-							.append("§7")
-							.append("▮".repeat(10));
+						stringBuilder.append("§7").repeat("▮", 10);
 					}
 					if (speedometer) {
 						stringBuilder.append(String.format(" %,6.2f b/s", 0f));
@@ -97,11 +95,6 @@ public abstract class AbstractMinecartMixin extends VehicleEntity {
 			}
 		});
 		if (tickCount % 5 != 0) return;
-		setBehavior();
-	}
-
-	@Unique
-	private void setBehavior() {
 		var cartConfig = Flashcarts.config.getConfigForMinecart(self);
 		if (cartConfig != null && cartConfig.shouldUseExperimentalPhysics()) {
 			if (this.behavior instanceof OldMinecartBehavior) {
