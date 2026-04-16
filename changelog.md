@@ -1,6 +1,5 @@
-﻿First Patch
+﻿Bugfixes
 ---
 
-- Fixed the bobbing up and down on ramps.
-- Fixed experimental minecarts not picking up mobs.
-- Fixed the orientation of minecarts on placement. 
+- Fixed minecarts with old physics moving parallel to each other interacting.
+- Fixed the desync of hitboxes of minecarts with old physics.
