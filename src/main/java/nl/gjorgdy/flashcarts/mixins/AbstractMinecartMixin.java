@@ -46,11 +46,6 @@ public abstract class AbstractMinecartMixin extends VehicleEntity {
 		needsSync = true;
 	}
 
-	@WrapMethod(method = "useExperimentalMovement")
-	private static boolean forceExperimentalMovement(Level level, Operation<Boolean> original) {
-		return true;
-	}
-
 	@Inject(at = @At("HEAD"), method = "tick")
 	public void tick(CallbackInfo ci) {
 		var speed = getSpeedBlocksPerSecond();
@@ -115,6 +110,35 @@ public abstract class AbstractMinecartMixin extends VehicleEntity {
 			return self.getKnownSpeed().length() * 20;
 		}
 		return Math.min(this.getKnownSpeed().length() * 20, cartConfig.getMaxSpeed());
+	}
+
+// override experimental physics checks
+
+	@WrapOperation(method = "getCurrentBlockPosOrRailBelow", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/vehicle/minecart/AbstractMinecart;useExperimentalMovement(Lnet/minecraft/world/level/Level;)Z"))
+	private boolean getCurrentBlockPosOrRailBelow(Level level, Operation<Boolean> original) {
+		return behavior instanceof NewMinecartBehavior;
+	}
+
+	@WrapOperation(method = "pushOtherMinecart", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/vehicle/minecart/AbstractMinecart;useExperimentalMovement(Lnet/minecraft/world/level/Level;)Z"))
+	private boolean pushOtherMinecart(Level level, Operation<Boolean> original) {
+		return behavior instanceof NewMinecartBehavior;
+	}
+
+	@WrapOperation(method = "move", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/vehicle/minecart/AbstractMinecart;useExperimentalMovement(Lnet/minecraft/world/level/Level;)Z"))
+	private boolean move(Level level, Operation<Boolean> original) {
+		return behavior instanceof NewMinecartBehavior;
+	}
+
+	@WrapOperation(method = "applyEffectsFromBlocks", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/vehicle/minecart/AbstractMinecart;useExperimentalMovement(Lnet/minecraft/world/level/Level;)Z"))
+	private boolean applyEffectsFromBlocks(Level level, Operation<Boolean> original) {
+		return behavior instanceof NewMinecartBehavior;
+	}
+
+	// always true for anything else, no matter the world settings
+
+	@WrapMethod(method = "useExperimentalMovement")
+	private static boolean forceExperimentalMovement(Level level, Operation<Boolean> original) {
+		return true;
 	}
 
 }
