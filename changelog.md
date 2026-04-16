@@ -1,4 +1,5 @@
-﻿Tiny Takeover, Tiny Wheels
+﻿Bugfixes
 ---
 
-- Updated to Minecraft version 26.1.2
+- Fixed minecarts with old physics moving parallel to each other interacting.
+- Fixed the desync of hitboxes of minecarts with old physics.

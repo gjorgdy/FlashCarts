@@ -28,7 +28,7 @@ public abstract class OldMinecartBehaviorMixin extends MinecartBehavior implemen
 		addStep();
 	}
 
-	@Inject(method = "moveAlongTrack", at = @At("HEAD"))
+	@Inject(method = "moveAlongTrack", at = @At("RETURN"))
 	public void onMoveAlongTrack(CallbackInfo ci) {
 		addStep();
 	}
@@ -46,7 +46,7 @@ public abstract class OldMinecartBehaviorMixin extends MinecartBehavior implemen
 
 	@Override
 	public List<NewMinecartBehavior.MinecartStep> flashCarts$popSteps() {
-		if (this.steps.isEmpty()) return ImmutableList.of();
+		if (this.steps.isEmpty()) addStep();
 		var stepsToReturn = ImmutableList.copyOf(this.steps);
 		resetSteps();
 		return stepsToReturn;
@@ -55,7 +55,9 @@ public abstract class OldMinecartBehaviorMixin extends MinecartBehavior implemen
 	@Unique
 	private void addStep() {
 		var movement = this.steps.isEmpty() ? Vec3.ZERO : minecart.position().subtract(this.steps.getLast().position());
-		var distance = movement.length();
+		// movement since first step
+		var totalMovement = this.steps.isEmpty() ? Vec3.ZERO : minecart.position().subtract(this.steps.getFirst().position());
+		var distance = totalMovement.length();
 		if (!this.steps.isEmpty() && distance == 0.0) {
 			var block = level().getBlockState(minecart.blockPosition());
 			var railShape = RailUtils.getRailShape(block);
@@ -90,11 +92,6 @@ public abstract class OldMinecartBehaviorMixin extends MinecartBehavior implemen
 		}
 		// horizontal rotation
 		float yRot = minecart.getYRot() * -1.0F + 180F;
-		if (movement.x > 0.3 ^ movement.z > 0.3) {
-			if (yRot % 90f != 0) {
-				yRot = Math.round(yRot / 90f) * 90f;
-			}
-		}
 		// vertical rotation
 		float xRot = 0f;
 		if (movement.y > 0.1) {
