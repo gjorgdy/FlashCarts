@@ -30,7 +30,7 @@ public class UseItemCallbackListener implements UseItemCallback {
     private static void clear(Player player, ISelectionHolder selectionHolder) {
         selectionHolder.flashCarts$clearStartPoint();
         if (player instanceof ServerPlayer splayer) {
-            splayer.displayClientMessage(Component.literal("§6Cleared selection"), true);
+            splayer.sendOverlayMessage(Component.literal("§6Cleared selection"));
             PlayerUtils.playDirectSound(splayer, SoundEvents.UI_BUTTON_CLICK.value(), SoundSource.BLOCKS);
             splayer.swing(InteractionHand.MAIN_HAND);
         }

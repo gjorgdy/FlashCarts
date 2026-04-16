@@ -1,6 +1,4 @@
-﻿First Patch
+﻿Tiny Takeover, Tiny Wheels
 ---
 
-- Fixed the bobbing up and down on ramps.
-- Fixed experimental minecarts not picking up mobs.
-- Fixed the orientation of minecarts on placement. 
+- Updated to Minecraft version 26.1.2
