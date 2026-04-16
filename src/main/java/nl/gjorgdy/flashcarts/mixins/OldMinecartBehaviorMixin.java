@@ -46,7 +46,7 @@ public abstract class OldMinecartBehaviorMixin extends MinecartBehavior implemen
 
 	@Override
 	public List<NewMinecartBehavior.MinecartStep> flashCarts$popSteps() {
-		if (this.steps.isEmpty()) return ImmutableList.of();
+		if (this.steps.isEmpty()) addStep();
 		var stepsToReturn = ImmutableList.copyOf(this.steps);
 		resetSteps();
 		return stepsToReturn;
@@ -55,7 +55,9 @@ public abstract class OldMinecartBehaviorMixin extends MinecartBehavior implemen
 	@Unique
 	private void addStep() {
 		var movement = this.steps.isEmpty() ? Vec3.ZERO : minecart.position().subtract(this.steps.getLast().position());
-		var distance = movement.length();
+		// movement since first step
+		var totalMovement = this.steps.isEmpty() ? Vec3.ZERO : minecart.position().subtract(this.steps.getFirst().position());
+		var distance = totalMovement.length();
 		if (!this.steps.isEmpty() && distance == 0.0) {
 			var block = level().getBlockState(minecart.blockPosition());
 			var railShape = RailUtils.getRailShape(block);

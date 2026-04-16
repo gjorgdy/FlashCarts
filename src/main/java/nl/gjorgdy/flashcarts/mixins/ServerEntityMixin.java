@@ -17,6 +17,8 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(ServerEntity.class)
 public abstract class ServerEntityMixin {
@@ -29,12 +31,11 @@ public abstract class ServerEntityMixin {
 	@Final
 	private Entity entity;
 
-	@WrapOperation(method = "sendChanges", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerEntity$Synchronizer;sendToTrackingPlayers(Lnet/minecraft/network/protocol/Packet;)V"))
-	private void cancelUpdate(ServerEntity.Synchronizer instance, Packet<? super ClientGamePacketListener> packet, Operation<Void> original) {
-		if (this.entity instanceof Minecart minecart && minecart.getBehavior() instanceof OldMinecartBehavior) {
-			return;
+	@Inject(method = "sendChanges", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;trackingPosition()Lnet/minecraft/world/phys/Vec3;"), cancellable = true)
+	public void cancelUpdate(CallbackInfo ci) {
+		if (entity instanceof AbstractMinecart minecart && minecart.getBehavior() instanceof OldMinecartBehavior) {
+			ci.cancel();
 		}
-		original.call(instance, packet);
 	}
 
 	@Definition(id = "AbstractMinecart", type = AbstractMinecart.class)
