@@ -48,7 +48,7 @@ public abstract class OldMinecartBehaviorMixin extends MinecartBehavior implemen
 	public List<NewMinecartBehavior.MinecartStep> flashCarts$popSteps() {
 		if (this.steps.isEmpty()) addStep();
 		var stepsToReturn = ImmutableList.copyOf(this.steps);
-		resetSteps();
+		if (this.steps.size() > 1) resetSteps();
 		return stepsToReturn;
 	}
 
@@ -56,57 +56,64 @@ public abstract class OldMinecartBehaviorMixin extends MinecartBehavior implemen
 	private void addStep() {
 		var movement = this.steps.isEmpty() ? Vec3.ZERO : minecart.position().subtract(this.steps.getLast().position());
 		// movement since first step
-		var totalMovement = this.steps.isEmpty() ? Vec3.ZERO : minecart.position().subtract(this.steps.getFirst().position());
-		var distance = totalMovement.length();
-		if (!this.steps.isEmpty() && distance == 0.0) {
-			var block = level().getBlockState(minecart.blockPosition());
-			var railShape = RailUtils.getRailShape(block);
-			// horizontal rotation
-			float yRot = switch (railShape) {
-				case ASCENDING_NORTH -> -90F;
-				case ASCENDING_SOUTH, NORTH_SOUTH -> 90F;
-				case ASCENDING_EAST, EAST_WEST -> 180F;
-				case NORTH_EAST -> -45F;
-				case SOUTH_WEST -> 135F;
-				case SOUTH_EAST -> -135F;
-				case NORTH_WEST -> 45F;
-				default -> 0F;
-			};
-			yRot *= minecart.isFlipped() ? -1.0F : 1.0F;
-			// vertical rotation
-			float xRot = switch (railShape) {
-				case ASCENDING_EAST, ASCENDING_WEST, ASCENDING_SOUTH, ASCENDING_NORTH -> 45F;
-				default -> 0F;
-			};
-			xRot *= minecart.isFlipped() ? -1.0F : 1.0F;
-			// add a step
-			this.steps.add(
-				new NewMinecartBehavior.MinecartStep(
-					minecart.position(),
-					movement,
-					yRot, xRot,
-					1.0F
-				)
-			);
+		if (movement.length() < 0.1) {
+			if (this.steps.isEmpty()) {
+				this.steps.add(calculateStillStep(movement));
+			}
 			return;
 		}
+		this.steps.add(calculateMovingStep(movement));
+	}
+
+	@Unique
+	private NewMinecartBehavior.MinecartStep calculateMovingStep(Vec3 movement) {
+		var distance = movement.length();
+
 		// horizontal rotation
-		float yRot = minecart.getYRot() * -1.0F + 180F;
+		float yRot = minecart.getYRot() * -1;
+
 		// vertical rotation
 		float xRot = 0f;
 		if (movement.y > 0.1) {
-			xRot = -45f;
-		} else if (movement.y < -0.1) {
 			xRot = 45f;
+		} else if (movement.y < -0.1) {
+			xRot = -45f;
 		}
 		xRot *= minecart.isFlipped() ? -1.0F : 1.0F;
-		// lerp step
-		this.steps.add(
-			new NewMinecartBehavior.MinecartStep(
-				minecart.position(),
-				minecart.getDeltaMovement(),
-				yRot, xRot, (float) distance
-			)
+
+		return new NewMinecartBehavior.MinecartStep(
+			minecart.position(),
+			movement,
+			yRot, xRot,
+			(float) distance
+		);
+	}
+
+	@Unique
+	private NewMinecartBehavior.MinecartStep calculateStillStep(Vec3 movement) {
+		var block = level().getBlockState(minecart.blockPosition());
+		var railShape = RailUtils.getRailShape(block);
+
+		// horizontal rotation
+		float yRot = switch (railShape) {
+			case NORTH_EAST, SOUTH_WEST -> -135F;
+			case ASCENDING_NORTH, ASCENDING_SOUTH, NORTH_SOUTH -> 90F;
+			case SOUTH_EAST, NORTH_WEST -> 45F;
+			case ASCENDING_EAST, ASCENDING_WEST, EAST_WEST -> 0.0F;
+		};
+		
+		// vertical rotation
+		float xRot = switch (railShape) {
+			case ASCENDING_EAST, ASCENDING_WEST, ASCENDING_SOUTH, ASCENDING_NORTH -> 45F;
+			default -> 0F;
+		};
+		xRot *= minecart.isFlipped() ? -1.0F : 1.0F;
+
+		return new NewMinecartBehavior.MinecartStep(
+			minecart.position(),
+			movement,
+			yRot, xRot,
+			1.0F
 		);
 	}
 
