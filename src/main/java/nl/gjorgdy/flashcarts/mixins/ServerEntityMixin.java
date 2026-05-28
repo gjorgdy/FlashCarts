@@ -5,9 +5,9 @@ import com.llamalad7.mixinextras.expression.Expression;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.protocol.game.ClientGamePacketListener;
-import net.minecraft.network.protocol.game.ClientboundMoveMinecartPacket;
+import net.minecraft.network.protocol.game.*;
 import net.minecraft.server.level.ServerEntity;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.vehicle.minecart.AbstractMinecart;
 import net.minecraft.world.entity.vehicle.minecart.Minecart;
@@ -31,11 +31,34 @@ public abstract class ServerEntityMixin {
 	@Final
 	private Entity entity;
 
-	@Inject(method = "sendChanges", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;trackingPosition()Lnet/minecraft/world/phys/Vec3;"), cancellable = true)
-	public void cancelUpdate(CallbackInfo ci) {
-		if (entity instanceof AbstractMinecart minecart && minecart.getBehavior() instanceof OldMinecartBehavior) {
-			ci.cancel();
+	@Shadow
+	private byte lastSentYHeadRot;
+
+	@Shadow
+	private int tickCount;
+
+	@Shadow
+	@Final
+	private VecDeltaCodec positionCodec;
+
+	@Shadow
+	private byte lastSentYRot;
+
+	@Shadow
+	private byte lastSentXRot;
+
+	@WrapOperation(method = "sendChanges", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerEntity$Synchronizer;sendToTrackingPlayers(Lnet/minecraft/network/protocol/Packet;)V"))
+	private void cancelUpdate(ServerEntity.Synchronizer instance, Packet<? super ClientGamePacketListener> packet, Operation<Void> original) {
+		// Cancel move and motion packets if minecart with old physics
+		if (this.entity instanceof Minecart minecart
+				&& minecart.getBehavior() instanceof OldMinecartBehavior
+				&& (packet instanceof ClientboundMoveEntityPacket
+				|| packet instanceof ClientboundSetEntityMotionPacket
+		)
+		) {
+			return;
 		}
+		original.call(instance, packet);
 	}
 
 	@Definition(id = "AbstractMinecart", type = AbstractMinecart.class)
@@ -50,6 +73,10 @@ public abstract class ServerEntityMixin {
 						lerpContainer.flashCarts$popSteps()
 					)
 				);
+
+				this.lastSentYRot = Mth.packDegrees(this.entity.getYRot());
+				this.lastSentXRot = Mth.packDegrees(this.entity.getXRot());
+				this.positionCodec.setBase(this.entity.position());
 				return false;
 			}
 			return true;

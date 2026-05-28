@@ -1,5 +1,4 @@
-﻿Bugfixes
+﻿Desync Bugfix
 ---
 
-- Fixed minecarts with old physics moving parallel to each other interacting.
-- Fixed the desync of hitboxes of minecarts with old physics.
+- Altered the way update suppression works to prevent minecarts not moving for some players 
