@@ -24,11 +24,15 @@ public abstract class OldMinecartBehaviorMixin extends MinecartBehavior implemen
 	private final List<NewMinecartBehavior.MinecartStep> steps = new LinkedList<>();
 
 	@Unique
+	private NewMinecartBehavior.MinecartStep lastStep;
+
+	@Unique
 	private boolean stopped = false;
 
 	protected OldMinecartBehaviorMixin(AbstractMinecart abstractMinecart) {
 		super(abstractMinecart);
 		addStep();
+		lastStep = steps.getLast();
 	}
 
 	@Inject(method = "moveAlongTrack", at = @At("RETURN"))
@@ -44,6 +48,7 @@ public abstract class OldMinecartBehaviorMixin extends MinecartBehavior implemen
 			this.steps.add(
 				new NewMinecartBehavior.MinecartStep(lastStep.position(), lastStep.movement(), lastStep.yRot(), lastStep.xRot(), 0.0f)
 			);
+			this.lastStep = lastStep;
 		}
 	}
 
@@ -61,13 +66,20 @@ public abstract class OldMinecartBehaviorMixin extends MinecartBehavior implemen
 		// movement since first step
 		if (movement.length() < 0.01) {
 			if (!stopped) {
-				this.steps.add(calculateStillStep());
+				addStep(calculateStillStep());
 				stopped = true;
 			}
 			return;
 		}
 		stopped = false;
-		this.steps.add(calculateMovingStep(movement));
+		addStep(calculateMovingStep(movement));
+	}
+
+	@Unique
+	private void addStep(NewMinecartBehavior.MinecartStep step) {
+		if (step == null) return;
+		this.steps.add(step);
+		this.lastStep = step;
 	}
 
 	@Unique
@@ -97,7 +109,9 @@ public abstract class OldMinecartBehaviorMixin extends MinecartBehavior implemen
 	@Unique
 	private NewMinecartBehavior.MinecartStep calculateStillStep() {
 		var block = level().getBlockState(minecart.blockPosition());
-		var railShape = RailUtils.getRailShape(block);
+		var railShapeOpt = RailUtils.getRailShape(block);
+		if (railShapeOpt.isEmpty()) return this.lastStep;
+		var railShape = railShapeOpt.get();
 
 		// horizontal rotation
 		float yRot = switch (railShape) {
@@ -106,6 +120,7 @@ public abstract class OldMinecartBehaviorMixin extends MinecartBehavior implemen
 			case SOUTH_EAST, NORTH_WEST -> 45F;
 			case ASCENDING_EAST, ASCENDING_WEST, EAST_WEST -> 0.0F;
 		};
+		yRot *= minecart.isFlipped() ? -1.0F : 1.0F;
 		
 		// vertical rotation
 		float xRot = switch (railShape) {
@@ -113,6 +128,9 @@ public abstract class OldMinecartBehaviorMixin extends MinecartBehavior implemen
 			case ASCENDING_NORTH, ASCENDING_EAST -> -45F;
 			default -> 0F;
 		};
+		if (this.lastStep != null && this.lastStep.xRot() != 0f && this.lastStep.xRot() != xRot) {
+			xRot = 0f;
+		}
 
 		return new NewMinecartBehavior.MinecartStep(
 			minecart.position(),
