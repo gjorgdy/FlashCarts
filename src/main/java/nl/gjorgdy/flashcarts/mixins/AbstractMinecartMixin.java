@@ -41,12 +41,13 @@ public abstract class AbstractMinecartMixin extends VehicleEntity {
 	}
 
 	@Inject(method = "<init>(Lnet/minecraft/world/entity/EntityType;Lnet/minecraft/world/level/Level;)V", at= @At("RETURN"))
-	public void forceSync(EntityType<?> entityType, Level level, CallbackInfo ci) {
+	public void forceSync(EntityType<?> type, Level level, CallbackInfo ci) {
 		needsSync = true;
 	}
 
 	@Inject(at = @At("HEAD"), method = "tick")
 	public void tick(CallbackInfo ci) {
+		if (level().isClientSide()) return;
 		var speed = getSpeedBlocksPerSecond();
 		getPassengers().forEach(p -> {
 			if (p instanceof ServerPlayer player && tickCount % 2 == 0) {
